@@ -71,7 +71,7 @@ $config = array (
  * are defined in the .config.inc.php located in the same 
  * directory as this sample
  ***********************************************************************/
-echo("current dir ".__DIR__."\n");
+
  $service = new MarketplaceWebService_Client(
      AWS_ACCESS_KEY_ID, 
      AWS_SECRET_ACCESS_KEY, 
@@ -97,7 +97,7 @@ echo("current dir ".__DIR__."\n");
  ***********************************************************************/
  // @TODO: set request. Action can be passed as MarketplaceWebService_Model_GetReportRequest
  // object or array of parameters
- $reportId =$_REQUEST["reportID"];
+ $reportId =$_REQUEST["reportId"];
  
  /*$parameters = array (
    'Merchant' => MERCHANT_ID,

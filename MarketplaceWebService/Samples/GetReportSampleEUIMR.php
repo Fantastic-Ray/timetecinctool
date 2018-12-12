@@ -39,7 +39,7 @@ date_default_timezone_set('America/Los_Angeles');
 // United States:
 //$serviceUrl = "https://mws.amazonservices.com";
 // United Kingdom
-//$serviceUrl = "https://mws.amazonservices.co.uk";
+$serviceUrl = "https://mws.amazonservices.co.uk";
 // Germany
 //$serviceUrl = "https://mws.amazonservices.de";
 // France
@@ -51,9 +51,11 @@ date_default_timezone_set('America/Los_Angeles');
 // China
 //$serviceUrl = "https://mws.amazonservices.com.cn";
 // Canada
-$serviceUrl = "https://mws.amazonservices.ca";
+//$serviceUrl = "https://mws.amazonservices.ca";
 // India
 //$serviceUrl = "https://mws.amazonservices.in";
+//Mexico
+//$serviceUrl = "https://mws.amazonservices.com.mx";
 
 $config = array (
   'ServiceURL' => $serviceUrl,
@@ -71,8 +73,8 @@ $config = array (
  ***********************************************************************/
 
  $service = new MarketplaceWebService_Client(
-     AWS_ACCESS_KEY_ID, 
-     AWS_SECRET_ACCESS_KEY, 
+     AWS_ACCESS_KEY_ID_EU, 
+     AWS_SECRET_ACCESS_KEY_EU, 
      $config,
      APPLICATION_NAME,
      APPLICATION_VERSION);
@@ -95,10 +97,8 @@ $config = array (
  ***********************************************************************/
  // @TODO: set request. Action can be passed as MarketplaceWebService_Model_GetReportRequest
  // object or array of parameters
- //$reportId =$_REQUEST["12254139162017855"];
- $requestData = $_REQUEST["requestData"];
- $reportId =explode("/",$requestData)[0];
- $requestCountry = explode("/",$requestData)[1];
+ $reportId =$_REQUEST["reportId"];
+ 
  /*$parameters = array (
    'Merchant' => MERCHANT_ID,
    'Report' => @fopen('php://memory', 'rw+'),
@@ -108,28 +108,12 @@ $config = array (
  $request = new MarketplaceWebService_Model_GetReportRequest($parameters);
 */
 $request = new MarketplaceWebService_Model_GetReportRequest();
-$request->setMerchant(MERCHANT_ID);
+$request->setMerchant(MERCHANTEU_ID);
 $request->setReport(@fopen('php://memory', 'rw+'));
 $request->setReportId($reportId);
-//$request->setMWSAuthToken('<MWS Auth Token>'); // Optional
-/*require __DIR__.'../../../vendor/autoload.php';
+$request->setMWSAuthToken('amzn.mws.7cb3ae52-b407-31a3-4499-482ff57d7ad8'); // Optional
 
-use Kreait\Firebase\Factory;
-use Kreait\Firebase\ServiceAccount;
-
-$serviceAccount = ServiceAccount::fromJsonFile(__DIR__.'../../timetec-data-d508d881d74d.json');
-
-$firebase = (new Factory)
-    ->withServiceAccount($serviceAccount)
-    ->withDatabaseUri('https://timetec-data.firebaseio.com/')
-    ->create();
-
-$database = $firebase->getDatabase();
-//die(print_r($database));
-//$database->getReference("Report/CAReport" )->push("fdas");
-*/
-invokeGetReport($service, $request, $database, $requestCountry);
-
+invokeGetReport($service, $request);
 
 /**
   * Get Report Action Sample
@@ -140,7 +124,7 @@ invokeGetReport($service, $request, $database, $requestCountry);
   * @param MarketplaceWebService_Interface $service instance of MarketplaceWebService_Interface
   * @param mixed $request MarketplaceWebService_Model_GetReport or array of parameters
   */
-  function invokeGetReport(MarketplaceWebService_Interface $service, $request,$database,$requestCountry) 
+  function invokeGetReport(MarketplaceWebService_Interface $service, $request) 
   {
       try {
               $response = $service->getReport($request);
@@ -162,44 +146,7 @@ invokeGetReport($service, $request, $database, $requestCountry);
                 echo($str);
                 
                 //echo(explode("\n",$str));
-                /*
-                $lines = explode("\n",$str);
-                $currentDate = date("YmdH");
-                $FBAInv = array();
-                $fulfillable=0;
-                $reserved = 0; 
-                $inbound = 0;
-                $receiving = 0;
-                for($i=0;$i< count($lines); $i++){
-                  $line = explode("\t",$lines[$i]);
-                  $sku = (explode(".",$line[0]))[0];
-                  $fulfillable = (int)$line[10];
-                  $reserved =(int) $line[12];
-                  $inbound = (int)$line[16];
-                  $receiving = (int)$line[17];
-                  if(isset($FBAInv[$sku])){
-                    $FBAInv[$sku]->fulfillable = $FBAInv[$sku]->fulfillable + $fulfillable;
-                    $FBAInv[$sku]->reserved = $FBAInv[$sku]->reserved + $reserved;
-                    $FBAInv[$sku]->inbound = $FBAInv[$sku]->inbound + $inbound;
-                    $FBAInv[$sku]->receiving = $FBAInv[$sku]->receiving + $receiving;
-                  }else{
-                    $FBAItem = new stdClass();
-                    $FBAItem-> fulfillable =  $fulfillable;
-                    $FBAItem-> reserved =  $reserved;
-                    $FBAItem-> inbound =  $inbound;
-                    $FBAItem-> receiving =  $receiving;
-                    $FBAInv[$sku] = $FBAItem;
-                    /*$FBAItem = array("fulfillable"=>$fulfillable,
-                    "reserved" =>  $reserved,
-                    "inbound" =>  $inbound,"receiving" =>  $receiving);
-                    $FBAInv[$sku] = $FBAItem;
-                  }
-                }
-                //echo($FBAInv);
-                //die(print($currentDate));
-              $database->getReference("Report/".$requestCountry."Report/".(String)$currentDate)->set(["FBAInv"=>$FBAInv]);
-                */
-
+               
                 //echo("            ResponseHeaderMetadata: " . $response->getResponseHeaderMetadata() . "\n");
      } catch (MarketplaceWebService_Exception $ex) {
          echo("Caught Exception: " . $ex->getMessage() . "\n");
@@ -211,4 +158,3 @@ invokeGetReport($service, $request, $database, $requestCountry);
          echo("ResponseHeaderMetadata: " . $ex->getResponseHeaderMetadata() . "\n");
      }
  }
-?>

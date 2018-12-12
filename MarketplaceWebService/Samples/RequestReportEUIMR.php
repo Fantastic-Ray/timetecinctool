@@ -17,14 +17,10 @@
  */
 
 /**
- * Get Report  Sample
+ * Report  Sample
  */
 
 include_once ('.config.inc.php'); 
-date_default_timezone_set('America/Los_Angeles');
-
-
-
 
 /************************************************************************
 * Uncomment to configure the client instance. Configuration settings
@@ -39,7 +35,7 @@ date_default_timezone_set('America/Los_Angeles');
 // United States:
 //$serviceUrl = "https://mws.amazonservices.com";
 // United Kingdom
-//$serviceUrl = "https://mws.amazonservices.co.uk";
+$serviceUrl = "https://mws.amazonservices.co.uk";
 // Germany
 //$serviceUrl = "https://mws.amazonservices.de";
 // France
@@ -51,7 +47,7 @@ date_default_timezone_set('America/Los_Angeles');
 // China
 //$serviceUrl = "https://mws.amazonservices.com.cn";
 // Canada
-$serviceUrl = "https://mws.amazonservices.ca";
+//$serviceUrl = "https://mws.amazonservices.ca";
 // India
 //$serviceUrl = "https://mws.amazonservices.in";
 
@@ -69,10 +65,9 @@ $config = array (
  * are defined in the .config.inc.php located in the same 
  * directory as this sample
  ***********************************************************************/
-
  $service = new MarketplaceWebService_Client(
-     AWS_ACCESS_KEY_ID, 
-     AWS_SECRET_ACCESS_KEY, 
+     AWS_ACCESS_KEY_ID_EU, 
+     AWS_SECRET_ACCESS_KEY_EU, 
      $config,
      APPLICATION_NAME,
      APPLICATION_VERSION);
@@ -91,61 +86,55 @@ $config = array (
 
 /************************************************************************
  * Setup request parameters and uncomment invoke to try out 
- * sample for Get Report Action
+ * sample for Report Action
  ***********************************************************************/
- // @TODO: set request. Action can be passed as MarketplaceWebService_Model_GetReportRequest
+// Constructing the MarketplaceId array which will be passed in as the the MarketplaceIdList 
+// parameter to the RequestReportRequest object.
+//$requestData = $_REQUEST["requestData"];
+$marketID = $_REQUEST["marketID"];
+$marketplaceIdArray = array("Id" => array($marketID));
+
+ // @TODO: set request. Action can be passed as MarketplaceWebService_Model_ReportRequest
  // object or array of parameters
- $reportId =$_REQUEST["reportId"];
  
  /*$parameters = array (
    'Merchant' => MERCHANT_ID,
-   'Report' => @fopen('php://memory', 'rw+'),
-   'ReportId' => $reportId,
-  // 'MWSAuthToken' => '<MWS Auth Token>', // Optional
- );
- $request = new MarketplaceWebService_Model_GetReportRequest($parameters);
-*/
-$request = new MarketplaceWebService_Model_GetReportRequest();
-$request->setMerchant(MERCHANT_ID);
-$request->setReport(@fopen('php://memory', 'rw+'));
-$request->setReportId($reportId);
-//$request->setMWSAuthToken('<MWS Auth Token>'); // Optional
+   'MarketplaceIdList' => $marketplaceIdArray,
+   'ReportType' => '_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA_',
+   'ReportOptions' => 'ShowSalesChannel=true',
+   //'MWSAuthToken' => '<MWS Auth Token>', // Optional
+ );*/
+ 
+ //$request = new MarketplaceWebService_Model_RequestReportRequest($parameters);
 
-invokeGetReport($service, $request);
+   $request = new MarketplaceWebService_Model_RequestReportRequest();
+   $request->setMarketplaceIdList($GLOBALS['marketplaceIdArray']);
+   $request->setMerchant(MERCHANTEU_ID);
+   $request->setReportType('_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA_');
+  // $request->setMWSAuthToken('<MWS Auth Token>'); // Optional
 
-/**
-  * Get Report Action Sample
-  * The GetReport operation returns the contents of a report. Reports can potentially be
-  * very large (>100MB) which is why we only return one report at a time, and in a
-  * streaming fashion.
-  *   
-  * @param MarketplaceWebService_Interface $service instance of MarketplaceWebService_Interface
-  * @param mixed $request MarketplaceWebService_Model_GetReport or array of parameters
-  */
-  function invokeGetReport(MarketplaceWebService_Interface $service, $request) 
+  // Using ReportOptions
+  // $request->setReportOptions('ShowSalesChannel=true');
+   $RequestRID = '';
+   
+  invokeRequestReport($service, $request);
+  function invokeRequestReport(MarketplaceWebService_Interface $service, $request) 
   {
       try {
-              $response = $service->getReport($request);
-              
-                if ($response->isSetGetReportResult()) {
-                  $getReportResult = $response->getGetReportResult(); 
-                 // echo ("            GetReport");
-                  
-                  if ($getReportResult->isSetContentMd5()) {
-                   // echo ("                ContentMd5");
-                    //echo ("                " . $getReportResult->getContentMd5() . "\n");
-                  }
-                }
-                
-                //echo ("        Report Contents\n");
-                //echo (stream_get_contents($request->getReport()) . "\n");
+              $response = $service->requestReport($request);
 
-                $str = stream_get_contents($request->getReport());
-                echo($str);
-                
-                //echo(explode("\n",$str));
-               
-                //echo("            ResponseHeaderMetadata: " . $response->getResponseHeaderMetadata() . "\n");
+                if ($response->isSetRequestReportResult()) { 
+                    $requestReportResult = $response->getRequestReportResult();
+                    if ($requestReportResult->isSetReportRequestInfo()) {
+                        $reportRequestInfo = $requestReportResult->getReportRequestInfo();
+                          if ($reportRequestInfo->isSetReportRequestId()) 
+                          {
+                             echo($reportRequestInfo->getReportRequestId());
+                             //return $reportRequestInfo->getReportRequestId();
+                          }
+                         
+                      }
+                } 
      } catch (MarketplaceWebService_Exception $ex) {
          echo("Caught Exception: " . $ex->getMessage() . "\n");
          echo("Response Status Code: " . $ex->getStatusCode() . "\n");
@@ -156,3 +145,5 @@ invokeGetReport($service, $request);
          echo("ResponseHeaderMetadata: " . $ex->getResponseHeaderMetadata() . "\n");
      }
  }
+
+ ?>
