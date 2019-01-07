@@ -114,7 +114,12 @@ function getIOsheetValue() {
       }
       //intial the data table
       for (var i = 0; i < IDLines.length; i++) {
-        if (IDLines[i].includes("NP")) {
+        if (
+          IDLines[i].includes("NP") ||
+          IDLines[i].includes("HN") ||
+          IDLines[i].includes("KS") ||
+          IDLines[i].includes("SD")
+        ) {
           infoTable[IDLines[i]] = {
             startLine: 0,
             lineNumber: 0,
@@ -135,7 +140,12 @@ function getIOsheetValue() {
       }
       //push data to table
       for (var i = 0; i < IDLines.length; i++) {
-        if (IDLines[i].includes("NP")) {
+        if (
+          IDLines[i].includes("NP") ||
+          IDLines[i].includes("HN") ||
+          IDLines[i].includes("KS") ||
+          IDLines[i].includes("SD")
+        ) {
           infoTable[IDLines[i]].inputData.push(QTYLines[i]);
           infoTable[IDLines[i]].orderID.push(orderLines[i]);
           infoTable[IDLines[i]].buyer.push(customerLines[i]);
@@ -149,7 +159,12 @@ function getIOsheetValue() {
         //
       }
       for (var id in infoTable) {
-        if (id.includes("NP")) {
+        if (
+          id.includes("NP") ||
+          id.includes("HN") ||
+          id.includes("KS") ||
+          id.includes("SD")
+        ) {
           totalNPNumer++;
         } else {
           totalSVNumber++;
@@ -158,7 +173,12 @@ function getIOsheetValue() {
 
       for (var id in infoTable) {
         //getLineNumber(id,totalNPNumer);
-        if (id.includes("NP")) {
+        if (
+          id.includes("NP") ||
+          id.includes("HN") ||
+          id.includes("KS") ||
+          id.includes("SD")
+        ) {
           getColNumber(pcSheetID, id);
         } else {
           getColNumber(svSheetID, id);
@@ -549,7 +569,12 @@ function getLineNumber(
         }
         valueArray.push(infoTable[ID].buyer);
         valueArray.push(infoTable[ID].orderID);
-        if (ID.includes("NP")) {
+        if (
+          ID.includes("NP") ||
+          ID.includes("HN") ||
+          ID.includes("KS") ||
+          ID.includes("SD")
+        ) {
           pcData.push({
             range: ID + "!A" + parseInt(number + 1) + ":Z",
             majorDimension: "COLUMNS",
@@ -567,7 +592,12 @@ function getLineNumber(
       } else {
         console.log("no data from PC 2018");
       }
-      if (ID.includes("NP")) {
+      if (
+        ID.includes("NP") ||
+        ID.includes("HN") ||
+        ID.includes("KS") ||
+        ID.includes("SD")
+      ) {
         processedNP++;
         if (processedNP == totalNPNumer) {
           sendToSheet(pcSheetID, pcData);
