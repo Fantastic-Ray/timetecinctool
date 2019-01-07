@@ -1,13 +1,11 @@
 var database = firebase.database();
 var requestReportID;
-//var reportID;
 var isSendRequest = false;
 let fulfillable = 0;
 let reserved = 0;
 let inbound = 0;
 let receiving = 0;
 var totalInv = [];
-//request US report
 let USFBATable = [];
 let USSpreadTable = [];
 let CAFBATable = [];
@@ -16,6 +14,8 @@ let MXFBATable = [];
 let MXSpraedTable = [];
 let EUFBATable = [];
 let EUSpreadTable = [];
+let JPFBATable = [];
+let JPSpreadTable = [];
 let totalFBATable = [];
 let totalSpreadTable = [];
 let singleSKUSpreadTable = [];
@@ -70,6 +70,10 @@ function getReadyReportRequestListUS() {
           });
         getReadyReport(reportID, "US");
         requestCAReport();
+        document.getElementById("USCompleteSpan").innerHTML =
+          "<h6>US Report Time: " +
+          currentTime +
+          " <span class='badge badge-success'>Complete</span></h6>";
       } else if (this.responseText.includes("CANCELLED")) {
         console.log("in not done");
         firebase
@@ -83,9 +87,16 @@ function getReadyReportRequestListUS() {
             requestCAReport();
             document.getElementById("txtHint").innerHTML =
               "Report requested got cancelled, using report at " + reportTime;
+            document.getElementById("USCompleteSpan").innerHTML =
+              "<h6>US Report Time: " +
+              reportTime +
+              " <span class='badge badge-success'>Complete</span></h6>";
           });
       } else {
         console.log("start to sleep");
+        $("#sendButton").html(
+          "<button type='button' style='margin-bottom:10px' class='btn btn-primary btn-sm' id='sendBtn' disabled>Requesting US Report</button>"
+        );
         $("#sendButton").append(
           "<div id='loader' style='display: inline-block; margin-left: 5px;'></div>"
         );
@@ -117,6 +128,12 @@ function requestCAReport() {
       isSendRequest = true;
       requestReportID = this.responseText;
       getReadyReportRequestListCA();
+      $("#sendButton").html(
+        "<button type='button' style='margin-bottom:10px' class='btn btn-primary btn-sm' id='sendBtn' disabled>Requesting CA Report</button>"
+      );
+      $("#sendButton").append(
+        "<div id='loader' style='display: inline-block; margin-left: 5px;'></div>"
+      );
     }
   };
 
@@ -148,6 +165,10 @@ function getReadyReportRequestListCA() {
           });
         getReadyReport(reportID, "CA");
         requestMXReport();
+        document.getElementById("CACompleteSpan").innerHTML =
+          "<h6>CA Report Time: " +
+          currentTime +
+          " <span class='badge badge-success'>Complete</span></h6>";
       } else if (this.responseText.includes("CANCELLED")) {
         firebase
           .database()
@@ -160,6 +181,10 @@ function getReadyReportRequestListCA() {
             requestMXReport();
             document.getElementById("txtHint").innerHTML =
               "Report requested got cancelled, using report at " + reportTime;
+            document.getElementById("CACompleteSpan").innerHTML =
+              "<h6>CA Report Time: " +
+              reportTime +
+              " <span class='badge badge-success'>Complete</span></h6>";
           });
       } else {
         console.log("start to sleep");
@@ -180,7 +205,7 @@ function getReadyReportRequestListCA() {
   );
   xmlhttp.send();
 }
-//===GET MEX======================================================================================
+//================================================GET MEX======================================================================================
 function requestMXReport() {
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.onreadystatechange = function() {
@@ -190,6 +215,12 @@ function requestMXReport() {
       isSendRequest = true;
       requestReportID = this.responseText;
       getReadyReportRequestListMX();
+      $("#sendButton").html(
+        "<button type='button' style='margin-bottom:10px' class='btn btn-primary btn-sm' id='sendBtn' disabled>Requesting MX Report</button>"
+      );
+      $("#sendButton").append(
+        "<div id='loader' style='display: inline-block; margin-left: 5px;'></div>"
+      );
     }
   };
 
@@ -220,6 +251,10 @@ function getReadyReportRequestListMX() {
           });
         getReadyReport(reportID, "MX");
         requestEUReport();
+        document.getElementById("MXCompleteSpan").innerHTML =
+          "<h6>MX Report Time: " +
+          currentTime +
+          " <span class='badge badge-success'>Complete</span></h6>";
       } else if (this.responseText.includes("CANCELLED")) {
         console.log("in not done");
         firebase
@@ -236,6 +271,10 @@ function getReadyReportRequestListMX() {
               reportID +
               " at " +
               reportTime;
+            document.getElementById("MXCompleteSpan").innerHTML =
+              "<h6>MX Report Time: " +
+              reportTime +
+              " <span class='badge badge-success'>Complete</span></h6>";
           });
       } else {
         console.log("start to sleep");
@@ -267,6 +306,12 @@ function requestEUReport() {
       isSendRequest = true;
       requestReportID = this.responseText;
       getReadyReportRequestListEU();
+      $("#sendButton").html(
+        "<button type='button' style='margin-bottom:10px' class='btn btn-primary btn-sm' id='sendBtn' disabled>Requesting EU Report</button>"
+      );
+      $("#sendButton").append(
+        "<div id='loader' style='display: inline-block; margin-left: 5px;'></div>"
+      );
     }
   };
 
@@ -296,6 +341,11 @@ function getReadyReportRequestListEU() {
             ReportDate: currentTime
           });
         getReadyReport(reportID, "EU");
+        requestJPReport();
+        document.getElementById("EUCompleteSpan").innerHTML =
+          "<h6>EU Report Time: " +
+          currentTime +
+          " <span class='badge badge-success'>Complete</span></h6>";
       } else if (this.responseText.includes("CANCELLED")) {
         console.log("in not done");
         firebase
@@ -306,8 +356,13 @@ function getReadyReportRequestListEU() {
             reportID = snapshot.val().ReportID;
             let reportTime = snapshot.val().ReportDate;
             getReadyReport(reportID, "EU");
+            requestJPReport();
             document.getElementById("txtHint").innerHTML =
               "Report requested got cancelled, using report at " + reportTime;
+            document.getElementById("EUCompleteSpan").innerHTML =
+              "<h6>EU Report Time: " +
+              reportTime +
+              " <span class='badge badge-success'>Complete</span></h6>";
           });
       } else {
         console.log("start to sleep");
@@ -323,6 +378,92 @@ function getReadyReportRequestListEU() {
   xmlhttp.open(
     "GET",
     "MarketplaceWebService/Samples/GetReportRequestListSampleEUIMR.php?requestID=" +
+      requestReportID,
+    true
+  );
+  xmlhttp.send();
+}
+//=====================JP Request=========================================================================
+function requestJPReport() {
+  var marketID = "A1VC38T7YXB528";
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("txtHint").innerHTML = this.responseText;
+      $("#txtHint").append("\nJust sent a JP request.");
+      isSendRequest = true;
+      requestReportID = this.responseText;
+      getReadyReportRequestListJP();
+      $("#sendButton").html(
+        "<button type='button' style='margin-bottom:10px' class='btn btn-primary btn-sm' id='sendBtn' disabled>Requesting JP Report</button>"
+      );
+      $("#sendButton").append(
+        "<div id='loader' style='display: inline-block; margin-left: 5px;'></div>"
+      );
+    }
+  };
+
+  xmlhttp.open(
+    "GET",
+    "MarketplaceWebService/Samples/RequestReportJPIMR.php?marketID=" + marketID,
+    true
+  );
+
+  xmlhttp.send();
+}
+function getReadyReportRequestListJP() {
+  let reportID;
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("txtHint").innerHTML = this.responseText;
+      let currentTime = getCurrentTime();
+      if (this.responseText.includes("DONE")) {
+        reportID = this.responseText.split("!")[1].replace(/[^\d.]/g, "");
+        console.log("reportID " + reportID);
+        firebase
+          .database()
+          .ref("Report/JPReport")
+          .update({
+            ReportID: reportID,
+            ReportDate: currentTime
+          });
+        getReadyReport(reportID, "JP");
+        document.getElementById("JPCompleteSpan").innerHTML =
+          "<h6>JP Report Time: " +
+          currentTime +
+          " <span class='badge badge-success'>Complete</span></h6>";
+      } else if (this.responseText.includes("CANCELLED")) {
+        console.log("in not done");
+        firebase
+          .database()
+          .ref("Report/JPReport")
+          .once("value")
+          .then(function(snapshot) {
+            reportID = snapshot.val().ReportID;
+            let reportTime = snapshot.val().ReportDate;
+            getReadyReport(reportID, "JP");
+            document.getElementById("txtHint").innerHTML =
+              "Report requested got cancelled, using report at " + reportTime;
+            document.getElementById("JPCompleteSpan").innerHTML =
+              "<h6>JP Report Time: " +
+              reportTime +
+              " <span class='badge badge-success'>Complete</span></h6>";
+          });
+      } else {
+        console.log("start to sleep");
+        sleep(15000).then(() => {
+          document.getElementById("txtHint").innerHTML =
+            "Waiting for JP report";
+          getReadyReportRequestListJP();
+          console.log("JP end sleeping");
+        });
+      }
+    }
+  };
+  xmlhttp.open(
+    "GET",
+    "MarketplaceWebService/Samples/GetReportRequestListSampleJPIMR.php?requestID=" +
       requestReportID,
     true
   );
@@ -356,16 +497,28 @@ function getReadyReport(reportID, country) {
       if (country == "EU") {
         EUFBATable = singleCountryTable;
         EUSpreadTable = convertToSpreadsheetTable(singleCountryTable);
+        //getFinalResult();
+      }
+      if (country == "JP") {
+        JPFBATable = singleCountryTable;
+        JPSpreadTable = convertToSpreadsheetTable(singleCountryTable);
         getFinalResult();
       }
       totalSpreadTable = convertToSpreadsheetTable(totalFBATable);
       singleSKUSpreadTable = convertToSpreadsheetTable(singleSKUTotalTable);
       console.log(country + "Table", singleCountryTable);
-      pushToTable(singleCountryTable, country);
+      //pushToTable(singleCountryTable, country);
       pushToTable(totalFBATable, "ALL");
     }
   };
-  if (country == "MX") {
+  if (country == "JP") {
+    xmlhttp.open(
+      "GET",
+      "MarketplaceWebService/Samples/GetReportSampleJPIMR.php?reportId=" +
+        reportID,
+      true
+    );
+  } else if (country == "MX") {
     xmlhttp.open(
       "GET",
       "MarketplaceWebService/Samples/GetReportSampleMXIMR.php?reportId=" +
@@ -489,7 +642,7 @@ function getFinalResult() {
   let localInvTable = [];
   gapi.client.sheets.spreadsheets.values
     .get({
-      spreadsheetId: "1Tz5Scf0dLG1XcozUghbCWfezSxxS7UVwdj5d3BaDYqs",
+      spreadsheetId: "1r4vvca5PZtGQG53r8AkGrW34gAwsCo2r4KJTEbEDdBs",
       range: "Master!A3:E"
     })
     .then(
@@ -507,8 +660,8 @@ function getFinalResult() {
           }
           gapi.client.sheets.spreadsheets.values
             .get({
-              spreadsheetId: "1Qj-DbZnBZXYaRKFM7GwV2Ti4EzPDscPZB5IX6-xOqWY",
-              range: "Master!A3:J"
+              spreadsheetId: "1A-u68BPi50FMdDQDN-S_ghqwXLzh2Lhp50F6jpLqo1M",
+              range: "Master!A2:J"
             })
             .then(
               function(response) {
@@ -528,6 +681,7 @@ function getFinalResult() {
                     let totalCAFBA = 0;
                     let totalMXFBA = 0;
                     let totalEUFBA = 0;
+                    let totalJPFBA = 0;
                     if (USFBATable[sku]) {
                       totalUSFBA = USFBATable[sku].Total;
                     }
@@ -540,15 +694,22 @@ function getFinalResult() {
                     if (EUFBATable[sku]) {
                       totalEUFBA = EUFBATable[sku].Total;
                     }
-
+                    if (JPFBATable[sku]) {
+                      totalJPFBA = JPFBATable[sku].Total;
+                    }
                     finalTotalTable[sku] = {
                       Local: localInvTable[sku],
                       USTotal: totalUSFBA,
                       CATotal: totalCAFBA,
                       MXTotal: totalMXFBA,
                       EUTotal: totalEUFBA,
+                      JPTotal: totalJPFBA,
                       TotalFBA:
-                        totalUSFBA + totalCAFBA + totalMXFBA + totalEUFBA
+                        totalUSFBA +
+                        totalCAFBA +
+                        totalMXFBA +
+                        totalEUFBA +
+                        totalJPFBA
                     };
                   }
                   console.log("finalTotalTable " + finalTotalTable);
@@ -616,10 +777,15 @@ function convertSinlgeSKU(table) {
         // when there is no K
         singleSKUTable[sku] = table[sku];
       }
+    } else {
+      // when there is no -
+      singleSKUTable[sku] = table[sku];
     }
   }
   return singleSKUTable;
 }
+
+//===========================Push to html table ========================================================================================
 function pushToTable(invTable, country) {
   $("#my" + country + "Table").empty();
   $("#my" + country + "Table").append(
@@ -663,7 +829,7 @@ function getCurrentTime() {
 const sleep = milliseconds => {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
 };
-//==============working on=================================================
+//==============================================================
 
 function convertToSpreadsheetTable(data) {
   let sheetTable = [];
@@ -707,7 +873,8 @@ function buildFinalTable(localInvTable, data) {
     "FBA US",
     "FBA CA",
     "FBA MX",
-    "FBA EU"
+    "FBA EU",
+    "FBA JP"
   ]);
   for (var sku in data) {
     let sheetline = [];
@@ -738,6 +905,7 @@ function buildFinalTable(localInvTable, data) {
     sheetline.push(data[sku].CATotal);
     sheetline.push(data[sku].MXTotal);
     sheetline.push(data[sku].EUTotal);
+    sheetline.push(data[sku].JPTotal);
     sheetTable.push(sheetline);
   }
   finalTotalSpreadsheetTable = sheetTable;
@@ -833,6 +1001,7 @@ function createNewSheet() {
       creatNewTab(response.result.spreadsheetId, "CA", CASpreadTable);
       creatNewTab(response.result.spreadsheetId, "MX", MXSpraedTable);
       creatNewTab(response.result.spreadsheetId, "EU", EUSpreadTable);
+      creatNewTab(response.result.spreadsheetId, "JP", JPSpreadTable);
       creatNewTab(response.result.spreadsheetId, "Total", totalSpreadTable);
       creatNewTab(
         response.result.spreadsheetId,
@@ -862,7 +1031,8 @@ function creatNewTab(spreadSheetID, country, sheetValueTable) {
             title: country,
             gridProperties: {
               rowCount: 100,
-              columnCount: 50
+              columnCount: 50,
+              frozenRowCount: 1
             },
             index: 0
           }
@@ -962,15 +1132,57 @@ function sendFormat(spreadSheetID, sheetId) {
 
     // TODO: Add desired properties to the request body.
   };
+  var batchUpdateSpreadsheetRequestBodyFormat = {
+    // A list of updates to apply to the spreadsheet.
+    // Requests will be applied in the order they are specified.
+    // If any request is not valid, no requests will be applied.
+    requests: [
+      {
+        repeatCell: {
+          range: {
+            startRowIndex: 0,
+            endRowIndex: 1,
+            sheetId: sheetId,
+            endColumnIndex: 20,
+            startColumnIndex: 0
+          },
+          cell: {
+            userEnteredFormat: {
+              textFormat: {
+                bold: true,
+                fontSize: 12
+              }
+            }
+          },
+          fields: "userEnteredFormat(textFormat)"
+        }
+      }
+    ] // TODO: Update placeholder value.
 
-  var request = gapi.client.sheets.spreadsheets.batchUpdate(
+    // TODO: Add desired properties to the request body.
+  };
+  var requestFormat = gapi.client.sheets.spreadsheets.batchUpdate(
     params,
-    batchUpdateSpreadsheetRequestBody
+    batchUpdateSpreadsheetRequestBodyFormat
   );
-  request.then(
+
+  requestFormat.then(
     function(response) {
       // TODO: Change code below to process the `response` object:
       console.log(response.result);
+      var request = gapi.client.sheets.spreadsheets.batchUpdate(
+        params,
+        batchUpdateSpreadsheetRequestBody
+      );
+      request.then(
+        function(response) {
+          // TODO: Change code below to process the `response` object:
+          console.log(response.result);
+        },
+        function(reason) {
+          console.error("error: " + reason.result.error.message);
+        }
+      );
     },
     function(reason) {
       console.error("error: " + reason.result.error.message);
@@ -981,7 +1193,7 @@ var localInvTable = [];
 function getLocalInv() {
   gapi.client.sheets.spreadsheets.values
     .get({
-      spreadsheetId: "1Tz5Scf0dLG1XcozUghbCWfezSxxS7UVwdj5d3BaDYqs",
+      spreadsheetId: "1r4vvca5PZtGQG53r8AkGrW34gAwsCo2r4KJTEbEDdBs",
       range: "Master!A3:E"
     })
     .then(

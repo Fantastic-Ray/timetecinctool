@@ -5,8 +5,9 @@ var totalNPNumer = 0;
 var totalSVNumber = 0;
 var processedNP = 0;
 var processedSV = 0;
-var pcSheetID = "1Tz5Scf0dLG1XcozUghbCWfezSxxS7UVwdj5d3BaDYqs";
-var svSheetID = "1Qj-DbZnBZXYaRKFM7GwV2Ti4EzPDscPZB5IX6-xOqWY";
+var pcSheetID = "1r4vvca5PZtGQG53r8AkGrW34gAwsCo2r4KJTEbEDdBs";
+//var pcSheetID = "1jSSA_Ad2XCceylBtnU_A-dd-WeCWfOYG1FRUPQ8GhP4"; //this is the test id
+var svSheetID = "1A-u68BPi50FMdDQDN-S_ghqwXLzh2Lhp50F6jpLqo1M";
 var aphabetArray = [
   "A",
   "B",
@@ -30,6 +31,9 @@ var aphabetArray = [
   "T"
 ];
 function getIOsheetValue() {
+  document.getElementById("sendButton").style.visibility = "hidden";
+  pcData = [];
+  svData = [];
   document.getElementById("loader").style.visibility = "visible";
   infoTable = [];
   var params = {
@@ -47,12 +51,9 @@ function getIOsheetValue() {
   var request = gapi.client.sheets.spreadsheets.values.get(params);
   request.then(
     function(response) {
+      var hasError = false;
       // TODO: Change code below to process the `response` object:
       console.log(response.result);
-      var IDInfo = response.result.values[0];
-      var QTYInfo = response.result.values[1];
-      var customerInfo = response.result.values[2];
-      var orderInfo = response.result.values[3];
 
       var IDLines = response.result.values[0];
       var QTYLines = response.result.values[1];
@@ -63,21 +64,53 @@ function getIOsheetValue() {
       console.log(QTYLines);
       console.log(customerLines);
       console.log(orderLines);
+      if (!IDLines) {
+        document.getElementById("txtHint").innerHTML =
+          "Missing ID please check";
+        hasError = true;
+      }
+      if (!QTYLines) {
+        document.getElementById("txtHint").innerHTML =
+          "Missing QTY please check";
+        hasError = true;
+      }
+      if (!customerLines) {
+        document.getElementById("txtHint").innerHTML =
+          "Missing customer please check";
+        hasError = true;
+      }
+      if (!orderLines) {
+        document.getElementById("txtHint").innerHTML =
+          "Missing order ID please check";
+        hasError = true;
+      }
+      if (hasError) {
+        document.getElementById("sendButton").style.visibility = "visible";
+        document.getElementById("loader").style.visibility = "hidden";
+        return;
+      }
       if (IDLines.length != QTYLines.length) {
         console.log("length not equal");
         document.getElementById("txtHint").innerHTML =
           "ID number and QTY number not match please check";
-        return;
+        hasError = true;
       } else if (IDLines.length != customerLines.length) {
         console.log("length not equal");
         document.getElementById("txtHint").innerHTML =
           "ID number and customer number not match please check";
+        hasError = true;
       } else if (IDLines.length != orderLines.length) {
         console.log("length not equal");
         document.getElementById("txtHint").innerHTML =
           "ID number and Order number not match please check";
+        hasError = true;
       } else {
         document.getElementById("txtHint").innerHTML = "All data lines matched";
+      }
+      if (hasError) {
+        document.getElementById("sendButton").style.visibility = "visible";
+        document.getElementById("loader").style.visibility = "hidden";
+        return;
       }
       //intial the data table
       for (var i = 0; i < IDLines.length; i++) {
@@ -260,6 +293,7 @@ function updateSignInStatus(isSignedIn) {
   if (isSignedIn) {
     document.getElementById("signinButton").style.display = "none";
     document.getElementById("sendButton").style.visibility = "visible";
+
     document.getElementById("IOType").style.visibility = "visible";
   } else {
     console.log("google logged out");
@@ -299,12 +333,19 @@ function getColNumber(sheetID, ID, type) {
       console.log(response.result);
       var FBANumber = 0;
       var CustomerNumber = 0;
+      var RINColNumber = 0;
+
+      var directShipColNumber = 0;
       var orderIDNumber = 0;
+      var POColNumber = 0;
+      var sumCol = 0;
+      var onHandCol = 0;
       var range = response.result;
       if (range.values.length > 0) {
         for (i = 0; i < range.values[0].length; i++) {
           if (range.values[0][i] == "FBA") {
             FBANumber = i;
+            console.log("FBA column ", FBANumber);
           }
           if (range.values[0][i] == "Customer Name") {
             CustomerNumber = i;
@@ -314,12 +355,40 @@ function getColNumber(sheetID, ID, type) {
           if (range.values[0][i] == "Order No.") {
             orderIDNumber = i;
           }
+          if (range.values[0][i] == "Sum") {
+            sumCol = i;
+          }
+          if (range.values[0][i] == "On Hand") {
+            onHandCol = i;
+          }
+          if (
+            range.values[0][i] == "FBM" ||
+            range.values[0][i] == "Direct Ship"
+          ) {
+            directShipColNumber = i;
+          }
+          if (range.values[0][i] == "PO") {
+            POColNumber = i;
+          }
+          if (range.values[0][i] == "RIN/ADJ" || range.values[0][i] == "RIN") {
+            RINColNumber = i;
+          }
         }
         console.log("FBA col num " + aphabetArray[FBANumber]);
         console.log("customerCol2 " + CustomerNumber);
-        getLineNumber(sheetID, ID, FBANumber, CustomerNumber, orderIDNumber);
+        getLineNumber(
+          sheetID,
+          ID,
+          FBANumber,
+          CustomerNumber,
+          sumCol,
+          onHandCol,
+          directShipColNumber,
+          POColNumber,
+          RINColNumber
+        );
       } else {
-        console.log("no data from PC 2018");
+        console.log("no data from PC 2019");
       }
     },
     function(reason) {
@@ -328,13 +397,23 @@ function getColNumber(sheetID, ID, type) {
     }
   );
 }
-function getLineNumber(sheetID, ID, FBAColNum, customerCol, orderCol) {
+function getLineNumber(
+  sheetID,
+  ID,
+  FBAColNum,
+  customerCol,
+  sumCol,
+  onHandCol,
+  directShipColNumber,
+  POColNumber,
+  RINColNumber
+) {
   var params = {
     // The ID of the spreadsheet to retrieve data from.
     spreadsheetId: sheetID, // TODO: Update placeholder value.
 
     // The A1 notation of the values to retrieve.
-    range: ID + "!A1:A", // TODO: Update placeholder value.
+    range: ID + "!A1:ZZ", // TODO: Update placeholder value.
 
     // How values should be represented in the output.
     // The default render option is ValueRenderOption.FORMATTED_VALUE.
@@ -353,12 +432,28 @@ function getLineNumber(sheetID, ID, FBAColNum, customerCol, orderCol) {
       // TODO: Change code below to process the `response` object:
       console.log(response.result);
       //getting the current line number
-      var number = 0;
+
       var range = response.result;
+      var number = range.values.length;
       if (range.values.length > 0) {
-        for (i = 0; i < range.values.length; i++) {
-          if (range.values[i] != null) {
-            number++;
+        console.log("range value length > 0");
+        for (let i = range.values.length - 1; i > 1; i--) {
+          //console.log("i is ", i);
+          let hasValue = false;
+          for (let j = 0; j < range.values[i].length; j++) {
+            if (range.values[i][j] != "" && j != sumCol && j != onHandCol) {
+              hasValue = true;
+              console.log("sum Col ", sumCol);
+              console.log("onHand ", onHandCol);
+              console.log("the first value found is ", range.values[i][j]);
+              break;
+            }
+          }
+
+          if (hasValue) {
+            break;
+          } else {
+            number--;
           }
         }
         console.log("line number is " + parseInt(number + 1));
@@ -369,6 +464,8 @@ function getLineNumber(sheetID, ID, FBAColNum, customerCol, orderCol) {
         var today = new Date();
         var dd = today.getDate();
         var mm = today.getMonth() + 1;
+        var inputColNumber = 0;
+        var isFBA = false;
         //loop though each item from input
         for (var j = 0; j < infoTable[ID].inputData.length; j++) {
           monthArray.push(mm);
@@ -380,42 +477,50 @@ function getLineNumber(sheetID, ID, FBAColNum, customerCol, orderCol) {
         //if it is the PO input------------------------------------------------------
         if (document.getElementById("PORadio").checked == true) {
           var tempPOArray = [];
+          inputColNumber = POColNumber;
           for (var d = 0; d < infoTable[ID].inputData.length; d++) {
             tempPOArray.push(infoTable[ID].inputData[d]);
           }
+          //jump to input column
+          for (var e = 0; e < inputColNumber - 2; e++) {
+            valueArray.push([]);
+          }
           valueArray.push(tempPOArray);
           //skip all colum to FBA column
-          valueArray.push([]);
-          valueArray.push([]);
-          valueArray.push([]);
-          valueArray.push([]);
         } else if (document.getElementById("RINRadio").checked == true) {
           //If it is RIN section-------------
           //jump to RIN colum
-          valueArray.push([]);
+          inputColNumber = RINColNumber;
+          //jump to input column
+          for (var e = 0; e < inputColNumber - 2; e++) {
+            valueArray.push([]);
+          }
+
           var tempRINArray = [];
           for (var d = 0; d < infoTable[ID].inputData.length; d++) {
             tempRINArray.push(infoTable[ID].inputData[d]);
           }
           valueArray.push(tempRINArray);
-          valueArray.push([]);
-          valueArray.push([]);
-          valueArray.push([]);
         } else if (document.getElementById("outgoingRadio").checked == true) {
           //If it is outgoing section-------------
           //jump to outgoing section
-          for (var j = 0; j < FBAColNum - 3; j++) {
+
+          for (var j = 0; j < directShipColNumber - 2; j++) {
             valueArray.push([]);
           }
           //initial FBA and FBM array
           var tempFBA = [];
           var tempFBM = [];
+
           //loop though each item id and push FBA or direct ship quantity temp FBA and FBM array.
           for (var d = 0; d < infoTable[ID].inputData.length; d++) {
             if (infoTable[ID].orderID[d].includes("FBA")) {
+              inputColNumber = FBAColNum;
               tempFBA.push(infoTable[ID].inputData[d]);
               tempFBM.push("");
+              isFBA = true;
             } else {
+              inputColNumber = directShipColNumber;
               tempFBM.push(infoTable[ID].inputData[d]);
               tempFBA.push("");
             }
@@ -424,10 +529,23 @@ function getLineNumber(sheetID, ID, FBAColNum, customerCol, orderCol) {
           valueArray.push(tempFBA);
         }
 
-        console.log("customerCol " + customerCol);
+        console.log("customerCol is" + customerCol);
         // jump to customer column--------------------------------------------
-        for (var k = 0; k < customerCol - FBAColNum - 1; k++) {
-          valueArray.push([]);
+        console.log("input Col is ", inputColNumber);
+        if (document.getElementById("outgoingRadio").checked == false) {
+          for (var k = 0; k < customerCol - inputColNumber - 1; k++) {
+            valueArray.push([]);
+          }
+        } else {
+          if (isFBA == false) {
+            for (var k = 0; k < customerCol - inputColNumber - 2; k++) {
+              valueArray.push([]);
+            }
+          } else {
+            for (var k = 0; k < customerCol - inputColNumber - 1; k++) {
+              valueArray.push([]);
+            }
+          }
         }
         valueArray.push(infoTable[ID].buyer);
         valueArray.push(infoTable[ID].orderID);
@@ -492,7 +610,9 @@ function sendToSheet(sheetID, data) {
     function(response) {
       // TODO: Change code below to process the `response` object:
       console.log(response.result);
+      document.getElementById("sendButton").style.visibility = "visible";
       appendPre("Data sent");
+      appendPre(JSON.stringify(data));
     },
     function(reason) {
       console.error("error: " + reason.result.error.message);

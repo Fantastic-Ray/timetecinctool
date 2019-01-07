@@ -335,7 +335,7 @@ var costList = [];
 function getPCCost() {
   gapi.client.sheets.spreadsheets.values
     .get({
-      spreadsheetId: "1Tz5Scf0dLG1XcozUghbCWfezSxxS7UVwdj5d3BaDYqs",
+      spreadsheetId: "1r4vvca5PZtGQG53r8AkGrW34gAwsCo2r4KJTEbEDdBs",
       range: "Master!A3:F"
     })
     .then(

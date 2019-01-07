@@ -5,13 +5,16 @@ var productStartLine;
 var USFBASheetID;
 var CAFBASheetID;
 var MXFBASheetID;
-
+var EUFBASheetID;
+var AUFBASheetID;
 $(document).ready(function() {
   var config = firebase.database().ref("config");
   config.once("value").then(function(snapshot) {
     USFBASheetID = snapshot.val().USFBASheetID;
     CAFBASheetID = snapshot.val().CAFBASheetID;
     MXFBASheetID = snapshot.val().MXFBASheetID;
+    EUFBASheetID = snapshot.val().EUFBASheetID;
+    AUFBASheetID = snapshot.val().AUFBASheetID;
     document.getElementById(
       "usSheetIDInput"
     ).value = snapshot.val().USFBASheetID;
@@ -21,7 +24,15 @@ $(document).ready(function() {
     document.getElementById(
       "mxSheetIDInput"
     ).value = snapshot.val().MXFBASheetID;
+    document.getElementById(
+      "euSheetIDInput"
+    ).value = snapshot.val().EUFBASheetID;
+    document.getElementById(
+      "auSheetIDInput"
+    ).value = snapshot.val().AUFBASheetID;
   });
+  document.getElementById("inputArea").innerHTML =
+    "<button id='signin-button' class='btn btn-primary' style='border:none; background-color:white !important; color:rgb(250,114,104)' onclick='handleSignInClick()'>Log in Google Account</button>";
 });
 function getInfo() {
   $("#myTableBody").empty();
@@ -31,8 +42,14 @@ function getInfo() {
   document.getElementById("mainTable").style.visibility = "visible";
   document.getElementById("costTable").style.visibility = "visible";
   document.getElementById("costTableTitle").style.visibility = "visible";
-  document.getElementById("sendDataDiv").style.visibility = "visible";
-
+  //document.getElementById("sendDataDiv").style.visibility = "visible";
+  document.getElementById("sendDataDiv").innerHTML =
+    "<button id='sendUSDataBtn' class='btn btn-primary' onclick='sendUSData()'>Send to US Sheet</button>" +
+    "<button id='sendCADataBtn' class='btn btn-primary' style='margin-left: 10px;' onclick='sendCAData()'>Send to CA Sheet</button>" +
+    "<button id='sendCADataBtn' class='btn btn-primary' style='margin-left: 10px;' onclick='sendMXData()'>Send to MX Sheet</button>" +
+    "<button id='sendEUDataBtn' class='btn btn-primary' style='margin-left: 10px;' onclick='sendEUData()'>Send to EU Sheet</button>" +
+    "<button id='sendAUDataBtn' class='btn btn-primary' style='margin-left: 10px;' onclick='sendAUData()'>Send to AU Sheet</button>" +
+    "<button class='btn btn-sm btn-outline-secondary' data-toggle='modal' data-target='.bd-example-modal-md'>Setting</button>";
   var fileInput = document.getElementById("tsv");
 
   var tsvFile = fileInput.files[0];
@@ -141,7 +158,7 @@ function getInfo() {
         if (kitNum >= 2) {
           reviewCard = "Review";
           if (Type.includes("D4")) {
-            reviewCard = "$5 Rebate Card";
+            reviewCard = "Review";
           }
         } else {
           reviewCard = "";
@@ -324,6 +341,7 @@ function getType(item, dataBase) {
     return "Not Found";
   }
 }
+
 function getPrice(item, dataBase) {
   //var ramDataOBJ = JSON.parse(ramData);
   //return dataBase[item].CostUSD;
@@ -346,6 +364,8 @@ function uploadIDData() {
   var usID = document.getElementById("usSheetIDInput").value;
   var caID = document.getElementById("caSheetIDInput").value;
   var mxID = document.getElementById("mxSheetIDInput").value;
+  var euID = document.getElementById("euSheetIDInput").value;
+  var auID = document.getElementById("auSheetIDInput").value;
   console.log("us id" + usID);
   console.log("ca id" + caID);
   console.log("mx id" + mxID);
@@ -375,6 +395,24 @@ function uploadIDData() {
       .ref("config")
       .update({
         MXFBASheetID: mxID
+      });
+  }
+  if (euID) {
+    EUFBASheetID = euID;
+    firebase
+      .database()
+      .ref("config")
+      .update({
+        EUFBASheetID: euID
+      });
+  }
+  if (auID) {
+    AUFBASheetID = auID;
+    firebase
+      .database()
+      .ref("config")
+      .update({
+        AUFBASheetID: auID
       });
   }
   $("#sheetIDModal").modal("hide");
@@ -418,8 +456,17 @@ function updateSignInStatus(isSignedIn) {
     getLocalInv();
     getLocalServerInv();
 
-    document.getElementById("signin-button").style.display = "none";
-    document.getElementById("fileInputDiv").style.visibility = "visible";
+    //document.getElementById("signin-button").style.display = "none";
+    //document.getElementById("fileInputDiv").style.visibility = "visible";
+    document.getElementById("inputArea").innerHTML =
+      " <form onsubmit='return getInfo()'>" +
+      "<div class='row'>" +
+      "<div class='col-xs-12 col-md-8' id='fileInputDiv'> <br/>" +
+      "<input type='file' id='tsv' name='tsv'/>" +
+      "<button id='submitBtn' type='submit' style='border:none; background-color:white !important; color:rgb(250,114,104)' class='btn btn-primary'>Submit</button>" +
+      "</div>" +
+      "</div>" +
+      "</form>";
   } else {
     console.log("logged out");
   }
@@ -462,6 +509,12 @@ function sendCAData() {
 }
 function sendMXData() {
   creatNewSheet(MXFBASheetID);
+}
+function sendEUData() {
+  creatNewSheet(EUFBASheetID);
+}
+function sendAUData() {
+  creatNewSheet(AUFBASheetID);
 }
 function appendValue(spreadSheetID) {
   var params = {
@@ -514,7 +567,7 @@ var localInvTable = [];
 function getLocalInv() {
   gapi.client.sheets.spreadsheets.values
     .get({
-      spreadsheetId: "1Tz5Scf0dLG1XcozUghbCWfezSxxS7UVwdj5d3BaDYqs",
+      spreadsheetId: "1r4vvca5PZtGQG53r8AkGrW34gAwsCo2r4KJTEbEDdBs",
       range: "Master!A3:E"
     })
     .then(
@@ -556,8 +609,8 @@ function getLocalInv() {
 function getLocalServerInv() {
   gapi.client.sheets.spreadsheets.values
     .get({
-      spreadsheetId: "1Qj-DbZnBZXYaRKFM7GwV2Ti4EzPDscPZB5IX6-xOqWY",
-      range: "Master!A3:J"
+      spreadsheetId: "1A-u68BPi50FMdDQDN-S_ghqwXLzh2Lhp50F6jpLqo1M",
+      range: "Master!A2:J"
     })
     .then(
       function(response) {
@@ -577,7 +630,7 @@ function getLocalServerInv() {
           }
           console.log("localSInvTable" + localInvTable["71TT16EUL2R8-8G"]);
         } else {
-          console.log("no data from Server 2018");
+          console.log("no data from Server 2019");
         }
       },
       function(response) {
@@ -745,6 +798,7 @@ function sendFormat(spreadSheetID) {
     function(response) {
       // TODO: Change code below to process the `response` object:
       console.log(response.result);
+      document.getElementById("loader").style.visibility = "hidden";
     },
     function(reason) {
       console.error("error: " + reason.result.error.message);

@@ -168,10 +168,10 @@ invokeGetReportRequestList($service, $request,$requestID);
                              
                               
                               //$minutes   = round($diff / 60);
-                              echo nl2br('now time sub  M ' . $diff->format('Y-m-d H:i:s') . "\n");
+                              //echo nl2br('now time sub  M ' . $diff->format('Y-m-d H:i:s') . "\n");
                               if($diff < $reportRequestInfo->getCompletedDate()){
                                if($reportRequestInfo->isSetGeneratedReportId()){
-                                  echo nl2br("NowDate " . $nowTime->format('Y-m-d H:i:s'). "\n");
+                                  //echo nl2br("NowDate " . $nowTime->format('Y-m-d H:i:s'). "\n");
                                   echo nl2br("getCompletedDate " . $reportRequestInfo->getCompletedDate()->format('Y-m-d H:i:s') . "\n");
                                   echo nl2br("getMostRecentGeneratedReportID Found!");
                                   echo nl2br($reportRequestInfo->getGeneratedReportId());

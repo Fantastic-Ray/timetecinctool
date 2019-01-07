@@ -41,35 +41,47 @@
       integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
       crossorigin="anonymous"
     ></script>
-
+    <!--Date picker-->
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"
+    />
+    <!--  -->
     <script src="scripts/nav.js"></script>
-    <script src="scripts/inventoryReports.js"></script>
+    <script src="scripts/saleReport.js"></script>
   </head>
 
   <body>
     <div id="navBar"></div>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="jumbotron">
-            <h1 class="display-4">Sales Rate Report</h1>
-            <p class="lead">Predict sales.</p>
 
-            <hr class="my-4" />
-            <br />
-            <br />
-            <div id="USCAButton"></div>
+    <div class="jumbotron">
+      <h1 class="display-4">Sales Rate Report</h1>
+      <p class="lead">Predict sales.</p>
 
-            <div id="MXButton"></div>
-            <br />
-            <br />
-            <div id="loader" style="visibility: hidden"></div>
-            <a id="txtHint"></a> <br />
-            <pre id="content"></pre>
-          </div>
-        </div>
-      </div>
+      <hr class="my-4" />
+      <input type="text" name="daterange" style="width: 190px" /> <br />
+      <br />
+      <div id="sendButton"></div>
+      <br />
+      <br />
+      <div id="loader" style="visibility: hidden"></div>
+      <a id="txtHint"></a> <br />
+      <pre id="content"></pre>
     </div>
+
     <!-- --------------------           body     -------------------------- -->
     <div class="row" style="margin-right: 10px; margin-left:10px">
       <div class="col">
@@ -99,5 +111,12 @@
     <br /><br />
 
     <br />
+    <script
+      async
+      defer
+      src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()"
+    ></script>
   </body>
 </html>

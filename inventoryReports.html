@@ -25,6 +25,7 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="css/loader.css" />
+    <link rel="stylesheet" href="css/report.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -48,34 +49,45 @@
 
   <body>
     <div id="navBar"></div>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="jumbotron">
-            <h1 class="display-4">Inventory Reports</h1>
-            <p class="lead">
-              This function collect US, CA, MX and EU Inventory Reports and
-              combine them together.
-            </p>
 
-            <hr class="my-4" />
-            <br />
-            <br />
-            <div class="row" style="width:500px;">
-              <div class="col"><div id="USButton"></div></div>
-              <div class="col"><div id="CAButton"></div></div>
-              <div class="col"><div id="MXButton"></div></div>
-              <div class="col"><div id="EUButton"></div></div>
-            </div>
-            <div id="sendButton"></div>
-            <a id="txtHint"></a> <br />
-            <pre id="content"></pre>
-          </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div
+          class="jumbotron"
+          style="background-color:rgb(250,114,104); color:white;"
+        >
+          <h1 class="display-4" style="font-weight: 600;">Inventory Reports</h1>
+          <p class="lead">
+            This function collect US, CA, MX and EU Inventory Reports and
+            combine them together.
+          </p>
+
+          <hr class="my-4" style="background-color:white" />
+          <br />
+          <br />
+          <!-- <div class="row" style="width:500px;">
+            <div class="col"><div id="USButton"></div></div>
+            <div class="col"><div id="CAButton"></div></div>
+            <div class="col"><div id="MXButton"></div></div>
+            <div class="col"><div id="EUButton"></div></div>
+          </div>-->
+          <div id="sendButton"></div>
+          <a id="txtHint" target="_blank"></a> <br />
+          <pre id="content"></pre>
         </div>
       </div>
     </div>
+
     <!-- --------------------           body     -------------------------- -->
     <div class="row" style="margin-right: 10px; margin-left:10px">
+      <div class="col"><div id="USCompleteSpan"></div></div>
+      <div class="col"><div id="CACompleteSpan"></div></div>
+      <div class="col"><div id="MXCompleteSpan"></div></div>
+      <div class="col"><div id="EUCompleteSpan"></div></div>
+      <div class="col"><div id="JPCompleteSpan"></div></div>
+    </div>
+    <!--Tables-->
+    <!--<div class="row" style="margin-right: 10px; margin-left:10px">
       <div class="col">
         <div class="table-responsive">
           <table
@@ -109,7 +121,15 @@
           ></table>
         </div>
       </div>
-    </div>
+      <div class="col">
+        <div class="table-responsive">
+          <table
+            id="myJPTable"
+            class="table table-sm table-bordred table-hover"
+          ></table>
+        </div>
+      </div>
+    </div>-->
 
     <div class="table-responsive" style="margin-right: 10px; margin-left:10px">
       <table
@@ -120,6 +140,17 @@
     <br /><br />
 
     <br />
+    <div style="margin-left:60px">
+      <footer>
+        <p>Posted by: Timetec International Corporation</p>
+        <p>
+          Contact information:
+          <a href="ragy@timetecinc.com">rayg@timetecinc.com</a>.
+        </p>
+        <p>Powered by: Ruigang Gu</p>
+        <p>Version: 1.20</p>
+      </footer>
+    </div>
     <script
       async
       defer

@@ -1,0 +1,5 @@
+#sendButton .btn-primary {
+  border: none;
+  background-color: white !important;
+  color: rgb(250, 114, 104);
+}

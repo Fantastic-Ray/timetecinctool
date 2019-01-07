@@ -36,6 +36,7 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="css/loader.css" />
+    <link rel="stylesheet" href="css/fba.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -57,72 +58,21 @@
 
   <body>
     <div id="navBar"></div>
-    <div class="container">
-      <div class="jumbotron">
-        <div class="col-md-12">
-          <h1 class="display-4">FBA Shipping Slip Generator</h1>
+
+    <div class="jumbotron" style="background-color:rgb(250,114,104);">
+      <div style="margin-left:60px; margin-top: 100px">
+        <div class="col-md-12" style="color:white; ">
+          <h1 class="display-4" style="font-weight: 600;">
+            FBA Shipping Slip Generator
+          </h1>
           <p class="lead">
             This generator need the SKU list tsv file from Amazon
           </p>
-          <hr class="my-4" />
+          <hr class="my-4" style="background-color:white" />
           <br />
-
-          <button
-            id="signin-button"
-            class="btn btn-primary"
-            onclick="handleSignInClick()"
-          >
-            Log in Google Account
-          </button>
-          <form onsubmit="return getInfo()">
-            <div class="row">
-              <div
-                class="col-xs-12 col-md-8"
-                id="fileInputDiv"
-                style="visibility: hidden"
-              >
-                <br />
-                <label for="avatar">TSV File:</label>
-                <input type="file" id="tsv" name="fbatsv" />
-                <button id="submitBtn" type="submit" class="btn btn-primary">
-                  Submit
-                </button>
-              </div>
-              <br />
-            </div>
-          </form>
-
+          <div id="inputArea"></div>
           <br />
-          <div id="sendDataDiv" style="visibility: hidden">
-            <button
-              id="sendUSDataBtn"
-              class="btn btn-primary"
-              onclick="sendUSData()"
-            >
-              Send to US Sheet
-            </button>
-            <button
-              id="sendCADataBtn"
-              class="btn btn-primary"
-              onclick="sendCAData()"
-            >
-              Send to CA Sheet
-            </button>
-            <button
-              id="sendCADataBtn"
-              class="btn btn-primary"
-              onclick="sendMXData()"
-            >
-              Send to MX Sheet
-            </button>
-            <button
-              class="btn btn-sm btn-outline-secondary"
-              data-toggle="modal"
-              data-target=".bd-example-modal-md"
-            >
-              Setting
-            </button>
-          </div>
+          <div id="sendDataDiv"></div>
           <a id="sheetLink"></a> <br />
           <pre id="content"></pre>
           <div>
@@ -131,69 +81,80 @@
           </div>
         </div>
       </div>
-      <!-- small window -->
-      <div
-        class="modal fade bd-example-modal-md"
-        tabindex="-1"
-        role="dialog"
-        aria-labelledby="mySmallModalLabel"
-        aria-hidden="true"
-        id="sheetIDModal"
-      >
-        <div class="modal-dialog modal-md">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">
-                Update Sheet ID
-              </h5>
+    </div>
+    <!-- small window -->
+    <div
+      class="modal fade bd-example-modal-md"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="mySmallModalLabel"
+      aria-hidden="true"
+      id="sheetIDModal"
+    >
+      <div class="modal-dialog modal-md">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Update Sheet ID</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <form onsubmit="return uploadIDData()">
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label"
+                  >US Sheet ID:</label
+                >
+                <input type="text" class="form-control" id="usSheetIDInput" />
+              </div>
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label"
+                  >CA Sheet ID:</label
+                >
+                <input type="text" class="form-control" id="caSheetIDInput" />
+              </div>
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label"
+                  >MX Sheet ID:</label
+                >
+                <input type="text" class="form-control" id="mxSheetIDInput" />
+              </div>
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label"
+                  >EU Sheet ID:</label
+                >
+                <input type="text" class="form-control" id="euSheetIDInput" />
+              </div>
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label"
+                  >AU Sheet ID:</label
+                >
+                <input type="text" class="form-control" id="auSheetIDInput" />
+              </div>
+            </div>
+            <div class="modal-footer">
               <button
                 type="button"
-                class="close"
+                class="btn btn-secondary"
                 data-dismiss="modal"
-                aria-label="Close"
               >
-                <span aria-hidden="true">&times;</span>
+                Close
               </button>
+              <button type="submit" class="btn btn-primary">Submit</button>
             </div>
-            <form onsubmit="return uploadIDData()">
-              <div class="modal-body">
-                <div class="form-group">
-                  <label for="recipient-name" class="col-form-label"
-                    >US Sheet ID:</label
-                  >
-                  <input type="text" class="form-control" id="usSheetIDInput" />
-                </div>
-                <div class="form-group">
-                  <label for="recipient-name" class="col-form-label"
-                    >CA Sheet ID:</label
-                  >
-                  <input type="text" class="form-control" id="caSheetIDInput" />
-                </div>
-                <div class="form-group">
-                  <label for="recipient-name" class="col-form-label"
-                    >MX Sheet ID:</label
-                  >
-                  <input type="text" class="form-control" id="mxSheetIDInput" />
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-dismiss="modal"
-                >
-                  Close
-                </button>
-                <button type="submit" class="btn btn-primary">Submit</button>
-              </div>
-            </form>
-          </div>
+          </form>
         </div>
       </div>
-      <!--
+    </div>
+    <!--
         ///////////////////////////////////////Result/////////////////////////////////////////////////////////
       -->
-
+    <div class="container">
       <div class="table-responsive">
         <div id="info"></div>
         <table class="table" id="mainTable" style="visibility: hidden">
@@ -238,17 +199,17 @@
       <br />
       <br />
       <br />
-      <div class="jumbotron">
-        <footer>
-          <p>Posted by: Timetec International Corporation</p>
-          <p>
-            Contact information:
-            <a href="mailto:someone@example.com">rayg@ttmemory.com</a>.
-          </p>
-          <p>Powered by: Ruigang Gu</p>
-          <p>Version: 1.20</p>
-        </footer>
-      </div>
+    </div>
+    <div style="margin-left:60px">
+      <footer>
+        <p>Posted by: Timetec International Corporation</p>
+        <p>
+          Contact information:
+          <a href="ragy@timetecinc.com">rayg@timetecinc.com</a>.
+        </p>
+        <p>Powered by: Ruigang Gu</p>
+        <p>Version: 1.20</p>
+      </footer>
     </div>
     <script src="scripts/nav.js"></script>
     <script

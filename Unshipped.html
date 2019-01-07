@@ -1,102 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Return Inbound System</title>
     <script src="https://www.gstatic.com/firebasejs/3.6.3/firebase.js"></script>
     <script>
-        var config = {
-            apiKey: "AIzaSyCaiqUn1UMOwuHVT01Mw8s-OSQl9QNHgpc",
-            authDomain: "timetec-data.firebaseapp.com",
-            databaseURL: "https://timetec-data.firebaseio.com",
-            storageBucket: "timetec-data.appspot.com",
-            messagingSenderId: "671839024565"
-        };
-        firebase.initializeApp(config);
-
+      var config = {
+        apiKey: "AIzaSyCaiqUn1UMOwuHVT01Mw8s-OSQl9QNHgpc",
+        authDomain: "timetec-data.firebaseapp.com",
+        databaseURL: "https://timetec-data.firebaseio.com",
+        storageBucket: "timetec-data.appspot.com",
+        messagingSenderId: "671839024565"
+      };
+      firebase.initializeApp(config);
     </script>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-        crossorigin="anonymous">
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous"
+    />
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-        crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+      integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+      crossorigin="anonymous"
+    ></script>
     <script src="scripts/nav.js"></script>
     <script src="scripts/unshipped.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="navBar"></div>
-    <div class="container">
-        <div class="jumbotron">
-            <h1 class="display-4">Unshipped Order</h1>
-            <p class="lead">Get all unshipped orders</p>
-            <hr class="my-4">
-            <br>
-            <br>
-            <a class="btn btn-primary btn-lg" id="getButton" href="#" role="button" onclick="getReadyReportRequestList()">Get Orders
-            </a>
-            <a class="btn btn-primary btn-lg" id="sendButton" href="#" role="button" style="visibility: hidden" onclick="handleSignInClick()">Send
-            </a>
-            <button class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target=".bd-example-modal-md">Setting</button>
-            <a id="txtHint"></a>
-        </div>
-        <div class="table-responsive">
-            <table id="myTable" class="table table-bordred table-hover">
-                <thead>
 
-                    <th>SKU</th>
-                    <th>Quantity</th>
-                    <th>Customer Name</th>
-                    <th>Order Number</th>
-
-                </thead>
-                <tbody id="myTableBody">
-
-                </tbody>
-
-            </table>
-        </div>
+    <div
+      class="jumbotron"
+      style="background-color:rgb(250,114,104); color:white;"
+    >
+      <h1 class="display-4" style="font-weight: 600; color:white; ">
+        Unshipped Order
+      </h1>
+      <p class="lead" style="color:white;">Get all unshipped orders</p>
+      <hr class="my-4" style="background-color:white;" />
+      <br />
+      <br />
+      <a
+        class="btn btn-primary btn-lg"
+        id="getButton"
+        href="#"
+        role="button"
+        onclick="getReadyReportRequestList()"
+        style="border:none; background-color:white !important; color:rgb(250,114,104)"
+        >Get Orders
+      </a>
+      <a
+        class="btn btn-primary btn-lg"
+        id="sendButton"
+        href="#"
+        role="button"
+        style="visibility: hidden; border:none; background-color:white !important; color:rgb(250,114,104)"
+        onclick="handleSignInClick()"
+        >Send
+      </a>
+      <button
+        class="btn btn-sm btn-outline-secondary"
+        data-toggle="modal"
+        data-target=".bd-example-modal-md"
+        style="  color: white !important; border-color: white !important;"
+      >
+        Setting
+      </button>
+      <a id="txtHint"></a>
     </div>
-    <div class="modal fade bd-example-modal-md" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
-      aria-hidden="true" id="sheetIDModal">
+    <div class="container">
+      <div class="table-responsive">
+        <table id="myTable" class="table table-bordred table-hover">
+          <thead>
+            <th>SKU</th>
+            <th>Quantity</th>
+            <th>Customer Name</th>
+            <th>Order Number</th>
+          </thead>
+          <tbody id="myTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+
+    <div style="margin-left:60px">
+      <footer>
+        <p>Posted by: Timetec International Corporation</p>
+        <p>
+          Contact information:
+          <a href="ragy@timetecinc.com">rayg@timetecinc.com</a>.
+        </p>
+        <p>Powered by: Ruigang Gu</p>
+        <p>Version: 1.20</p>
+      </footer>
+    </div>
+    <div
+      class="modal fade bd-example-modal-md"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="mySmallModalLabel"
+      aria-hidden="true"
+      id="sheetIDModal"
+    >
       <div class="modal-dialog modal-md">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Update Sheet ID</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <form onsubmit="return uploadIDData()">
             <div class="modal-body">
-
               <div class="form-group">
-                <label for="recipient-name" class="col-form-label">Non FBA Sheet ID:</label>
-                <input type="text" class="form-control" id="NonFBASheetIDInput">
+                <label for="recipient-name" class="col-form-label"
+                  >Non FBA Sheet ID:</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="NonFBASheetIDInput"
+                />
               </div>
-              
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
               <button type="submit" class="btn btn-primary">Submit</button>
             </div>
-
           </form>
         </div>
       </div>
     </div>
-    <script async defer src="https://apis.google.com/js/api.js" onload="this.onload=function(){};handleClientLoad()"
-        onreadystatechange="if (this.readyState === 'complete') this.onload()">
-        </script>
-</body>
-
+    <script
+      async
+      defer
+      src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()"
+    ></script>
+  </body>
 </html>

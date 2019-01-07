@@ -14,7 +14,7 @@ $(document).ready(function() {
 });
 function uploadIDData() {
   var SheetID = document.getElementById("NonFBASheetIDInput").value;
-  NonFBASheetID = sheetID;
+  NonFBASheetID = SheetID;
   if (SheetID) {
     firebase
       .database()
@@ -335,7 +335,7 @@ function appendFormula(sheetID, range, updatedRows) {
   startPoint = parseInt(startPoint);
   startPoint += 3;
   for (let i = 0; i < updatedRows - 3; i++) {
-    idList.push("=VLOOKUP(A" + startPoint + ",'SBT 2018'!$A:$C,3,FALSE)");
+    idList.push("=VLOOKUP(A" + startPoint + ",'SBT 2019'!$A:$C,3,FALSE)");
 
     noteList.push(
       "=B" +
@@ -379,14 +379,14 @@ function appendFormula(sheetID, range, updatedRows) {
       "=IFERROR(vlookup(B" +
         startPoint +
         ",IMPORTRANGE(" +
-        '"1Tz5Scf0dLG1XcozUghbCWfezSxxS7UVwdj5d3BaDYqs",' +
+        '"1r4vvca5PZtGQG53r8AkGrW34gAwsCo2r4KJTEbEDdBs",' +
         '"' +
         "'Master'!A2:F200" +
         '"' +
         "),5,false),vlookup(B" +
         startPoint +
         ",IMPORTRANGE(" +
-        '"1Qj-DbZnBZXYaRKFM7GwV2Ti4EzPDscPZB5IX6-xOqWY",' +
+        '"1A-u68BPi50FMdDQDN-S_ghqwXLzh2Lhp50F6jpLqo1M",' +
         '"' +
         "'Master'!A1:J200" +
         '"' +

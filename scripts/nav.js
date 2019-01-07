@@ -1,7 +1,3 @@
-var dataPageSelec = "nav-item";
-var listingPageSelec = "nav-item";
-var fbaPageSelec = "nav-item";
-var invIOPageSelec = "nav-item";
 var name, email, photoUrl, uid;
 
 $(document).ready(function() {
@@ -25,25 +21,16 @@ $(document).ready(function() {
       window.location = "index.html";
     }
   });
-
-  var current_page = location.pathname.split("/").pop();
-  if (current_page == "data.html") {
-    dataPageSelec = "nav-item active";
-  } else if (current_page == "listing.html") {
-    listingPageSelec = "nav-item active";
-  } else if (current_page == "fba.html" || current_page == "FBAPlan.html") {
-    fbaPageSelec = "nav-item active";
-  } else if (current_page == "myProfile.html") {
-    $(".navbar #myProfile").addClass("active");
-  } else if (current_page == "inventoryIO.html") {
-    $(".navbar #myProfile").addClass("active");
-  }
   initialNavBar();
+  $("#navBar .navbar-nav .nav-item").click(function(e) {
+    console.log("clicked nav");
+    $(this).addClass("active");
+  });
 });
 
 function initialNavBar() {
   document.getElementById("navBar").innerHTML =
-    "<nav class='navbar navbar-fixed-top navbar-expand-lg navbar-light bg-light flex-md-nowrap p-0 shadow'>" +
+    "<nav id ='mainNav' class='navbar navbar-light fixed-top navbar-expand-lg bg-light p-0 shadow'>" +
     "<a class='navbar-brand' href='data.html'>" +
     " <img src='image/ICON.png' width='30' height='30' class='d-inline-block align-top' alt=''>" +
     " Timetec Inc</a>" +
@@ -51,35 +38,26 @@ function initialNavBar() {
     " <span class='navbar-toggler-icon'></span>" +
     "</button>" +
     " <div class='collapse navbar-collapse' id='navbarNavDropdown'>" +
-    "<ul class='navbar-nav mr-auto'>" +
-    "<li id='listingPage'class='" +
-    invIOPageSelec +
-    "'>" +
+    "<ul class='navbar-nav mr-auto' id='navBtnGroup'>" +
+    "<li class='nav-item'>" +
     "<a class='nav-link' href='dashboard.html'>Dashboard</a>" +
     "</li>" +
-    "<li id='listingPage'class='" +
-    invIOPageSelec +
-    "'>" +
+    "<li id='unshippedNav' class='nav-item' active>" +
     "<a class='nav-link' href='Unshipped.html'>Unshipped Order</a>" +
     "</li>" +
-    "<li id='dataPage' class='" +
-    dataPageSelec +
-    "'>" +
+    "<li class='nav-item'>" +
     "<a class='nav-link' href='data.html'>Memory Data</a>" +
     "</li>" +
-    "<li id='listingPage'class='" +
-    listingPageSelec +
-    "'>" +
+    "<li class='nav-item'>" +
     "<a class='nav-link' href='listing.html'>Listing</a>" +
     "</li>" +
-    "<li id='listingPage'class='" +
-    listingPageSelec +
-    "'>" +
+    "<li class='nav-item'>" +
+    "<a class='nav-link' href='saleRate.html'>Sales</a>" +
+    "</li>" +
+    "<li class='nav-item'>" +
     "<a class='nav-link' href='inventoryIO.html'>Inventory Recording</a>" +
     "</li>" +
-    "<li id='listingPage'class='" +
-    invIOPageSelec +
-    "'>" +
+    "<li class='nav-item'>" +
     "<a class='nav-link' href='inventoryReports.html'>Inventory Report</a>" +
     "</li>" +
     " <li class='nav-item dropdown'>" +

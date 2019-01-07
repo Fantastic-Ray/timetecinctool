@@ -21,7 +21,13 @@
  */
 
 include_once ('.config.inc.php'); 
+$requestInfo = $_REQUEST["requstInfo"];
+$requestInfo = explode("/", $requestInfo);
+$requestCountry =  $requestInfo[1];
+$requestID = $requestInfo[0];
+$serviceUrl = "https://mws.amazonservices.com";
 
+echo("current ID ". $requestID."\n");
 /************************************************************************
 * Uncomment to configure the client instance. Configuration settings
 * are:
@@ -33,9 +39,13 @@ include_once ('.config.inc.php');
 // IMPORTANT: Uncomment the approiate line for the country you wish to
 // sell in:
 // United States:
-$serviceUrl = "https://mws.amazonservices.com";
+if($requestCountry == "US" || $requestCountry == "CA" || $requestCountry == "MX"){
+  $serviceUrl = "https://mws.amazonservices.com";
+}
 // United Kingdom
-//$serviceUrl = "https://mws.amazonservices.co.uk";
+if($requestCountry == "EU"){
+  $serviceUrl = "https://mws.amazonservices.co.uk";
+}
 // Germany
 //$serviceUrl = "https://mws.amazonservices.de";
 // France
@@ -43,7 +53,9 @@ $serviceUrl = "https://mws.amazonservices.com";
 // Italy
 //$serviceUrl = "https://mws.amazonservices.it";
 // Japan
-//$serviceUrl = "https://mws.amazonservices.jp";
+if($requestCountry == "JP"){
+  $serviceUrl = "https://mws.amazonservices.jp";
+}
 // China
 //$serviceUrl = "https://mws.amazonservices.com.cn";
 // Canada
@@ -57,7 +69,7 @@ $config = array (
   'ProxyPort' => -1,
   'MaxErrorRetry' => 3,
 );
-
+echo("service url ". $serviceUrl. "\n");
 /************************************************************************
  * Instantiate Implementation of MarketplaceWebService
  * 
@@ -65,13 +77,29 @@ $config = array (
  * are defined in the .config.inc.php located in the same 
  * directory as this sample
  ***********************************************************************/
- $service = new MarketplaceWebService_Client(
-     AWS_ACCESS_KEY_ID, 
-     AWS_SECRET_ACCESS_KEY, 
-     $config,
-     APPLICATION_NAME,
-     APPLICATION_VERSION);
- 
+$service = new MarketplaceWebService_Client(
+  AWS_ACCESS_KEY_ID, 
+  AWS_SECRET_ACCESS_KEY, 
+  $config,
+  APPLICATION_NAME,
+  APPLICATION_VERSION);
+
+if($requestCountry == "EU"){
+  $service = new MarketplaceWebService_Client(
+      AWS_ACCESS_KEY_ID_EU, 
+      AWS_SECRET_ACCESS_KEY_EU, 
+      $config,
+      APPLICATION_NAME,
+      APPLICATION_VERSION);
+}
+if($requestCountry == "JP"){
+  $service = new MarketplaceWebService_Client(
+      AWS_ACCESS_KEY_ID_JP, 
+      AWS_SECRET_ACCESS_KEY_JP, 
+      $config,
+      APPLICATION_NAME,
+      APPLICATION_VERSION);
+}
 /************************************************************************
  * Uncomment to try out Mock Service that simulates MarketplaceWebService
  * responses without calling MarketplaceWebService service.
@@ -90,7 +118,7 @@ $config = array (
  ***********************************************************************/
  // @TODO: set request. Action can be passed as MarketplaceWebService_Model_GetReportListRequest
  // object or array of parameters
- $requestID = $_REQUEST["requestID"];
+
 //echo nl2br("            ResponseMetadata\n" . $requestID);
  /*$parameters = array (
    'Merchant' => MERCHANT_ID,
@@ -102,6 +130,16 @@ array_push($stack,$requestID);
 
 $request = new MarketplaceWebService_Model_GetReportRequestListRequest();
 $request->setMerchant(MERCHANT_ID);
+if($requestCountry == "MX"){
+    $request->setMerchant(MERCHANTMX_ID);
+    $request->setMWSAuthToken('amzn.mws.7cb3ae52-b407-31a3-4499-482ff57d7ad8');
+}
+if($requestCountry == "EU"){
+    $request->setMerchant(MERCHANTEU_ID);
+}
+if($requestCountry == "JP"){
+    $request->setMerchant(MERCHANTJP_ID);
+}
 //$request->setReportRequestIdList($stack);
 //$request->setMWSAuthToken('<MWS Auth Token>'); // Optional
 // 
@@ -168,7 +206,7 @@ invokeGetReportRequestList($service, $request,$requestID);
                              
                               
                               //$minutes   = round($diff / 60);
-                              echo nl2br('now time sub  M ' . $diff->format('Y-m-d H:i:s') . "\n");
+                              //echo nl2br('now time sub  M ' . $diff->format('Y-m-d H:i:s') . "\n");
                               if($diff < $reportRequestInfo->getCompletedDate()){
                                if($reportRequestInfo->isSetGeneratedReportId()){
                                   echo nl2br("NowDate " . $nowTime->format('Y-m-d H:i:s'). "\n");

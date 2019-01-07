@@ -33,7 +33,7 @@ include_once ('.config.inc.php');
 // IMPORTANT: Uncomment the approiate line for the country you wish to
 // sell in:
 // United States:
-$serviceUrl = "https://mws.amazonservices.com";
+//$serviceUrl = "https://mws.amazonservices.com";
 // United Kingdom
 //$serviceUrl = "https://mws.amazonservices.co.uk";
 // Germany
@@ -43,7 +43,7 @@ $serviceUrl = "https://mws.amazonservices.com";
 // Italy
 //$serviceUrl = "https://mws.amazonservices.it";
 // Japan
-//$serviceUrl = "https://mws.amazonservices.jp";
+$serviceUrl = "https://mws.amazonservices.jp";
 // China
 //$serviceUrl = "https://mws.amazonservices.com.cn";
 // Canada
@@ -66,8 +66,8 @@ $config = array (
  * directory as this sample
  ***********************************************************************/
  $service = new MarketplaceWebService_Client(
-     AWS_ACCESS_KEY_ID, 
-     AWS_SECRET_ACCESS_KEY, 
+     AWS_ACCESS_KEY_ID_JP, 
+     AWS_SECRET_ACCESS_KEY_JP, 
      $config,
      APPLICATION_NAME,
      APPLICATION_VERSION);
@@ -101,9 +101,9 @@ $stack = array();
 array_push($stack,$requestID);
 
 $request = new MarketplaceWebService_Model_GetReportRequestListRequest();
-$request->setMerchant(MERCHANTMX_ID);
+$request->setMerchant(MERCHANTJP_ID);
 //$request->setReportRequestIdList($stack);
-$request->setMWSAuthToken('amzn.mws.7cb3ae52-b407-31a3-4499-482ff57d7ad8'); // Optional
+//$request->setMWSAuthToken('amzn.mws.7cb3ae52-b407-31a3-4499-482ff57d7ad8'); // Optional
 // 
 invokeGetReportRequestList($service, $request,$requestID);
 
