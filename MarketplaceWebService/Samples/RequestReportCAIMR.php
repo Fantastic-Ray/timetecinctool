@@ -114,7 +114,7 @@ $marketplaceIdArray = array("Id" => array('A2EUQ1WTGCTBG2'));
   // Using ReportOptions
   // $request->setReportOptions('ShowSalesChannel=true');
    $RequestRID = '';
-   
+ 
   invokeRequestReport($service, $request);
   function invokeRequestReport(MarketplaceWebService_Interface $service, $request) 
   {

@@ -114,7 +114,10 @@ $marketplaceIdArray = array("Id" => array('A2EUQ1WTGCTBG2'));
   // Using ReportOptions
   // $request->setReportOptions('ShowSalesChannel=true');
    $RequestRID = '';
-
+   $current_dir = dirname(__FILE__);
+   $prefix = "crontest-";
+   $now = date("Y-m-d.H:i:s");
+  
   invokeRequestReport($service, $request);
   function invokeRequestReport(MarketplaceWebService_Interface $service, $request) 
   {

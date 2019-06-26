@@ -1,0 +1,5 @@
+.table th {
+  position: sticky;
+  top: 25px;
+  z-index: 10;
+}

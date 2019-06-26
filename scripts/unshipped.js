@@ -12,21 +12,7 @@ $(document).ready(function() {
     ).value = snapshot.val().NonFBASheetID;
   });
 });
-function uploadIDData() {
-  var SheetID = document.getElementById("NonFBASheetIDInput").value;
-  NonFBASheetID = SheetID;
-  if (SheetID) {
-    firebase
-      .database()
-      .ref("config")
-      .update({
-        NonFBASheetID: SheetID
-      });
-  }
 
-  $("#sheetIDModal").modal("hide");
-  return false;
-}
 function requestAReport(callback) {
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.onreadystatechange = function() {
@@ -66,11 +52,18 @@ function getReadyReportRequestList() {
         });
       } else if (this.responseText.includes("None") && isSendRequest == true) {
         console.log("still not found");
-        document.getElementById("getButton").firstChild.data = "Wait for 10s";
+        $("#sendDiv").html(
+          "<div id='loader' style='display: inline-block; margin-left: 5px;'></div>"
+        );
+        document.getElementById("getButton").firstChild.data = "Please Wait";
         $("#txtHint").append(
           "\nStill waiting for the report from Amazon. Please wait 10s then click again"
         );
         //getReadyReportRequestList();
+        sleep(5000).then(() => {
+          getReadyReportRequestList();
+          console.log("end Sleeping");
+        });
       } else {
         reportID = this.responseText.split("!")[1].replace(/[^\d.]/g, "");
         console.log("requestID " + reportID);

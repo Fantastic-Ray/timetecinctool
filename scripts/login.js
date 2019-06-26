@@ -6,18 +6,29 @@ var config = {
   messagingSenderId: "671839024565"
 };
 firebase.initializeApp(config);
+
 const auth = firebase.auth();
 
 var database = firebase.database();
-
+/*function signUp() {
+  var email = "gu_ruigang@hotmail.com";
+  var password = "Timetec1911";
+  firebase
+    .auth()
+    .createUserWithEmailAndPassword(email, password)
+    .catch(function(error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      console.log(errorCode);
+      console.log(errorMessage);
+      // ...
+    });
+}*/
 function authLogin() {
-  var name, userEmail, photoUrl, uid;
+  var email = document.getElementById("inputEmail").value;
+  var password = document.getElementById("inputPassword").value;
 
-  //const email = document.getElementById('inputEmail').value;
-  //const password = document.getElementById('inputPassword').value;
-  const email = "rayg@ttmemory.com";
-  const password = "team1911";
-  const promise = auth.signInWithEmailAndPassword(email, password);
   firebase
     .auth()
     .signInWithEmailAndPassword(email, password)

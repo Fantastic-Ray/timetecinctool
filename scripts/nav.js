@@ -13,7 +13,7 @@ $(document).ready(function() {
 
       console.log("name: " + name);
       console.log("email: " + email);
-      console.log(uid);
+      initialNavBar();
       // window.location = 'data.html';
     } else {
       // No user is signed in.
@@ -21,7 +21,7 @@ $(document).ready(function() {
       window.location = "index.html";
     }
   });
-  initialNavBar();
+
   $("#navBar .navbar-nav .nav-item").click(function(e) {
     console.log("clicked nav");
     $(this).addClass("active");
@@ -29,8 +29,9 @@ $(document).ready(function() {
 });
 
 function initialNavBar() {
+  console.log("user email", email);
   document.getElementById("navBar").innerHTML =
-    "<nav id ='mainNav' class='navbar navbar-light fixed-top navbar-expand-lg bg-light p-0 shadow'>" +
+    "<nav id ='mainNav' class='navbar navbar-light fixed-top navbar-expand-lg bg-light p-0 shadow'style='background-color:white !important;'>" +
     "<a class='navbar-brand' href='data.html'>" +
     " <img src='image/ICON.png' width='30' height='30' class='d-inline-block align-top' alt=''>" +
     " Timetec Inc</a>" +
@@ -66,16 +67,28 @@ function initialNavBar() {
     "<a class='dropdown-item' href='FBAPlan.html'>FBA Shipping Plan</a>" +
     "<a class='dropdown-item' href='fba.html'>FBA Shipping Slip</a>" +
     "</div>" +
-    "</li>" +
-    " <li class='nav-item dropdown'>" +
+    "</li></ul>" +
+    "<ul class='navbar-nav ml-auto'><li class='nav-item dropdown' style='left: auto !important;right: 0px;'>" +
     "<a class='nav-link dropdown-toggle' href='#' id='navbarDropdownMenuLink' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'  >" +
-    name +
+    email +
     "</a>" +
     "<div class='dropdown-menu' aria-labelledby='navbarDropdownMenuLink'>" +
-    "<a class='dropdown-item' href='#'>Logout</a>" +
+    "<a class='dropdown-item' href='#'onclick='logout()'>Logout</a>" +
     "</div>" +
     "</li>" +
     "</ul>" +
     "</div>" +
     "</nav>";
+}
+function logout() {
+  firebase
+    .auth()
+    .signOut()
+    .then(function() {
+      // Sign-out successful.
+      window.location = "index.html";
+    })
+    .catch(function(error) {
+      // An error happened.
+    });
 }

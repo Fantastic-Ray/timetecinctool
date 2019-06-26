@@ -7,7 +7,7 @@ let reserved = 0;
 let inbound = 0;
 let receiving = 0;
 var totalSales = [];
-var countryList = ["MX", "JP"];
+var countryList = ["JP"];
 var currentCountryIndex = 0;
 var requestStartDate = "";
 var requestEndDate = "";
@@ -16,12 +16,20 @@ $(document).ready(function() {
   $("#sendButton").html(
     "<button type='button' style='margin-bottom:10px' class='btn btn-primary btn-sm' id='sendBtn'  onclick='handleAuthClick()'>Sign In</button>"
   );
+  $("#testButton").html(
+    "<button type='button' style='margin-bottom:10px' class='btn btn-primary btn-sm' id='testBtn'  onclick='testGetAll()'>Test</button>"
+  );
 });
-
+function testGetAll() {
+  var market = "CA";
+  var type = "_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA_";
+  var result = requestAReport(market, type);
+  console.log("result ", result);
+}
 //request All report =======================================================================================
 
 function requestAllReport() {
-  requestReports("CA");
+  requestReports("MX");
 }
 
 //request US ===============================================================================================
@@ -179,7 +187,7 @@ function getSingleCountrySales(result) {
     let dequantity = 0;
     let jpquantity = 0;
     line = lines[i].split("\t");
-    sku = line[0].split(".")[0];
+    sku = line[11].split(".")[0];
     status = line[4];
     if (line[6].includes(".")) {
       channel = line[6].split(".")[1];
@@ -285,9 +293,9 @@ function getCurrentTime() {
     today.getMinutes()
   );
 }
-const sleep = milliseconds => {
+/*const sleep = milliseconds => {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
-};
+};*/
 $(function() {
   $('input[name="daterange"]').daterangepicker(
     {

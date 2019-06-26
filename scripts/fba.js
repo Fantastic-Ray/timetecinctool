@@ -7,6 +7,7 @@ var CAFBASheetID;
 var MXFBASheetID;
 var EUFBASheetID;
 var AUFBASheetID;
+var JPFBASheetID;
 $(document).ready(function() {
   var config = firebase.database().ref("config");
   config.once("value").then(function(snapshot) {
@@ -15,6 +16,7 @@ $(document).ready(function() {
     MXFBASheetID = snapshot.val().MXFBASheetID;
     EUFBASheetID = snapshot.val().EUFBASheetID;
     AUFBASheetID = snapshot.val().AUFBASheetID;
+    JPFBASheetID = snapshot.val().JPFBASheetID;
     document.getElementById(
       "usSheetIDInput"
     ).value = snapshot.val().USFBASheetID;
@@ -30,6 +32,9 @@ $(document).ready(function() {
     document.getElementById(
       "auSheetIDInput"
     ).value = snapshot.val().AUFBASheetID;
+    document.getElementById(
+      "jpSheetIDInput"
+    ).value = snapshot.val().JPFBASheetID;
   });
   document.getElementById("inputArea").innerHTML =
     "<button id='signin-button' class='btn btn-primary' style='border:none; background-color:white !important; color:rgb(250,114,104)' onclick='handleSignInClick()'>Log in Google Account</button>";
@@ -49,6 +54,7 @@ function getInfo() {
     "<button id='sendCADataBtn' class='btn btn-primary' style='margin-left: 10px;' onclick='sendMXData()'>Send to MX Sheet</button>" +
     "<button id='sendEUDataBtn' class='btn btn-primary' style='margin-left: 10px;' onclick='sendEUData()'>Send to EU Sheet</button>" +
     "<button id='sendAUDataBtn' class='btn btn-primary' style='margin-left: 10px;' onclick='sendAUData()'>Send to AU Sheet</button>" +
+    "<button id='sendJPDataBtn' class='btn btn-primary' style='margin-left: 10px;' onclick='sendJPData()'>Send to JP Sheet</button>" +
     "<button class='btn btn-sm btn-outline-secondary' data-toggle='modal' data-target='.bd-example-modal-md'>Setting</button>";
   var fileInput = document.getElementById("tsv");
 
@@ -154,7 +160,7 @@ function getInfo() {
           card = "";
         }
 
-        Type = getType(singleSKU, dataBase);
+        Type = getItemType(singleSKU);
         if (kitNum >= 2) {
           reviewCard = "Review";
           if (Type.includes("D4")) {
@@ -164,8 +170,21 @@ function getInfo() {
           reviewCard = "";
         }
         //console.log(Type);
-        singlePrice = getPrice(singleSKU, dataBase);
-        singleWeight = getWeight(singleSKU, dataBase);
+        if (Type != "Other" && Type != "Camera") {
+          console.log("type", Type);
+          singlePrice = localInvTable[singleSKU].cost;
+
+          if (localInvTable[singleSKU].cost.includes("$")) {
+            singlePrice = parseFloat(
+              localInvTable[singleSKU].cost.replace("$", "")
+            );
+          } else {
+            singlePrice = parseFloat(localInvTable[singleSKU].cost);
+          }
+        } else {
+          singlePrice = 0;
+        }
+        singleWeight = getItemWeight(Type, kitNum);
         dataTable[i] = {
           SKU: sku,
           FNSKU: FNSKU,
@@ -315,33 +334,61 @@ function getInfo() {
   return false;
 }
 
-function getID(item) {
+/*function getID(item) {
   //console.log("dataBase is [0] Key " + dataBase[item].ID);
   if (dataBase[item] != null) {
     return dataBase[item].ID;
   } else {
     return "Not Found";
   }
-}
-function getLocalInv(item) {
+}*/
+/*function getLocalInv(item) {
   if (dataBase[item] != null) {
     return dataBase[item].LocalInventory;
   } else {
     return "Not Found";
   }
-}
+}*/
 
-function getType(item, dataBase) {
-  //var ramDataOBJ = JSON.parse(ramData);
-
-  //return dataBase[item].Type;
-  if (dataBase[item] != null) {
-    return dataBase[item].Type;
+function getItemType(item) {
+  var type;
+  if (item.substring(0, 1) == "3") {
+    type = "SSD";
+  } else if (item.substring(0, 2) == "75") {
+    type = "UDIMM";
+  } else if (item.substring(0, 2) == "76" || item.substring(0, 2) == "78") {
+    type = "SODIMM";
+  } else if (item.substring(0, 1) == "6") {
+    type = "Camera";
   } else {
-    return "Not Found";
+    type = "Other";
   }
-}
+  if (type != "SSD" && type != "Camera" && type != "Other") {
+    console.log("ram type", type);
+    if (parseInt(item.substring(4, 6)) <= 20) {
+      type += " DDR3";
+    } else {
+      type += " DDR4";
+    }
+    type = type + " " + item.split("-")[1];
+  }
 
+  return type;
+}
+function getItemWeight(type, kit) {
+  var weight;
+  type = type.split(" ")[0];
+  switch (type) {
+    case "UDIMM":
+      weight = 0.07;
+      break;
+    case "SODIMM":
+      weight = 0.03;
+      break;
+  }
+
+  return weight;
+}
 function getPrice(item, dataBase) {
   //var ramDataOBJ = JSON.parse(ramData);
   //return dataBase[item].CostUSD;
@@ -516,6 +563,9 @@ function sendEUData() {
 function sendAUData() {
   creatNewSheet(AUFBASheetID);
 }
+function sendJPData() {
+  creatNewSheet(JPFBASheetID);
+}
 function appendValue(spreadSheetID) {
   var params = {
     // The ID of the spreadsheet to update.
@@ -568,7 +618,7 @@ function getLocalInv() {
   gapi.client.sheets.spreadsheets.values
     .get({
       spreadsheetId: "1r4vvca5PZtGQG53r8AkGrW34gAwsCo2r4KJTEbEDdBs",
-      range: "Master!A3:E"
+      range: "Master!A3:F"
     })
     .then(
       function(response) {
@@ -577,8 +627,13 @@ function getLocalInv() {
           for (i = 0; i < range.values.length; i++) {
             var row = range.values[i];
             // Print columns A and E, which correspond to indices 0 and 4.
+            console.log("row 5", row[5]);
             if (!localInvTable[row[3]]) {
-              localInvTable[row[3]] = { ID: row[0], localInv: row[4] };
+              localInvTable[row[3]] = {
+                ID: row[0],
+                localInv: row[4],
+                cost: row[5]
+              };
             } else {
               if (parseInt(localInvTable[row[3]].localInv) < parseInt(row[4])) {
                 console.log(
@@ -591,11 +646,15 @@ function getLocalInv() {
                     " " +
                     row[4]
                 );
-                localInvTable[row[3]] = { ID: row[0], localInv: row[4] };
+                localInvTable[row[3]] = {
+                  ID: row[0],
+                  localInv: row[4],
+                  cost: row[5]
+                };
               }
             }
           }
-          console.log("localInvTable" + localInvTable["75TT13NU2R8-8G"]);
+          console.log("localInvTable" + localInvTable["75TT13NU2R8-8G"].cost);
         } else {
           console.log("no data from PC 2018");
         }
@@ -610,7 +669,7 @@ function getLocalServerInv() {
   gapi.client.sheets.spreadsheets.values
     .get({
       spreadsheetId: "1A-u68BPi50FMdDQDN-S_ghqwXLzh2Lhp50F6jpLqo1M",
-      range: "Master!A2:J"
+      range: "Master!A2:K"
     })
     .then(
       function(response) {
@@ -621,10 +680,18 @@ function getLocalServerInv() {
 
             // Print columns A and E, which correspond to indices 0 and 4.
             if (!localInvTable[row[3]]) {
-              localInvTable[row[3]] = { ID: row[0], localInv: row[9] };
+              localInvTable[row[3]] = {
+                ID: row[0],
+                localInv: row[9],
+                cost: row[10]
+              };
             } else {
               if (parseInt(localInvTable[row[3]].localInv) < parseInt(row[9])) {
-                localInvTable[row[3]] = { ID: row[0], localInv: row[9] };
+                localInvTable[row[3]] = {
+                  ID: row[0],
+                  localInv: row[9],
+                  cost: row[10]
+                };
               }
             }
           }

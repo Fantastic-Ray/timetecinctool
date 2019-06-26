@@ -1,0 +1,15 @@
+#signinButton {
+  border: none;
+  background-color: white !important;
+  color: rgb(250, 114, 104);
+}
+#sendButton {
+  border: none;
+  background-color: white !important;
+  color: rgb(250, 114, 104);
+}
+#sendDataDiv .btn-sm {
+  margin-left: 10px;
+  color: white !important;
+  border-color: white !important;
+}

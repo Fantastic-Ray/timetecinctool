@@ -16,7 +16,7 @@
       };
       firebase.initializeApp(config);
     </script>
-    <title>FBA Shipment Plan</title>
+    <title>Inventory Recording System</title>
 
     <link
       rel="stylesheet"
@@ -25,6 +25,7 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="css/loader.css" />
+    <link rel="stylesheet" href="css/invIO.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -48,99 +49,110 @@
 
   <body>
     <div id="navBar"></div>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="jumbotron">
-            <h1 class="display-4">Inventory Recording System</h1>
-            <p class="lead">
-              This system collects Item SKU, ID and QTY them send the
-              information to TT.PC and TT.Server Google Spreadsheet.
-            </p>
-            <p class="lead">
-              For outgoing RAM, please use FBA shipment ID for the order ID, if
-              it is for FBA shipment.
-            </p>
-            <p>
-              Fill your data in the Spreadsheet below. And make sure it is empty
-              before using it.
-            </p>
-            <a
-              target="_blank"
-              href="https://docs.google.com/spreadsheets/d/1DF_16W8WoNKrfOzFGq7TRnV6I_0uTsi94tMQ2iPGeWI/edit?usp=sharing"
-              >Inventory IO Spreadsheet</a
-            >
 
-            <hr class="my-4" />
-            <br />
-            <br />
-            <a
-              class="btn btn-primary btn-lg"
-              id="signinButton"
-              href="#"
-              role="button"
-              onclick="handleSignInClick()"
-              >Log in Google Account</a
-            >
+    <div
+      class="jumbotron"
+      style="background-color:rgb(250,114,104); color:white"
+    >
+      <h1 class="display-4">Inventory Recording System</h1>
+      <p class="lead">
+        This system collects Item SKU, ID and QTY them send the information to
+        TT.PC and TT.Server Google Spreadsheet.
+      </p>
+      <p class="lead">
+        For outgoing RAM, please use FBA shipment ID for the order ID, if it is
+        for FBA shipment.
+      </p>
+      <p>
+        Fill your data in the Spreadsheet below. And make sure it is empty
+        before using it.
+      </p>
+      <a
+        target="_blank"
+        href="https://docs.google.com/spreadsheets/d/1biM6KF4C0PNlORq4riqACAAZZck3CUgra9qbNG9f6O0/edit?usp=sharing"
+        >Inventory IO Spreadsheet</a
+      >
 
-            <a
-              class="btn btn-primary btn-lg"
-              id="sendButton"
-              style="visibility: hidden"
-              href="#"
-              role="button"
-              onclick="getIOsheetValue()"
-              >Process Info</a
-            >
+      <hr class="my-4" />
+      <br />
+      <br />
+      <a
+        class="btn btn-primary btn-lg"
+        id="signinButton"
+        href="#"
+        role="button"
+        onclick="handleSignInClick()"
+        >Log in Google Account</a
+      >
 
-            <br />
-            <br />
-            <div id="IOType" style="visibility: hidden">
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="inlineRadioOptions"
-                  id="PORadio"
-                  value="PO"
-                  checked
-                />
-                <label class="form-check-label" for="inlineRadio1">PO</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="inlineRadioOptions"
-                  id="RINRadio"
-                  value="RIN"
-                />
-                <label class="form-check-label" for="inlineRadio2">RIN</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="inlineRadioOptions"
-                  id="outgoingRadio"
-                  value="Outgoing"
-                />
-                <label class="form-check-label" for="inlineRadio3"
-                  >Direct Ship/FBA</label
-                >
-              </div>
-            </div>
-            <div id="loader" style="visibility: hidden"></div>
-            <a id="txtHint"></a> <br />
-            <pre id="content"></pre>
-          </div>
-          <!--
+      <a
+        class="btn btn-primary btn-lg"
+        id="sendButton"
+        style="visibility: hidden"
+        href="#"
+        role="button"
+        onclick="getIOsheetValue()"
+        >Process Info</a
+      >
+
+      <br />
+      <br />
+      <div id="IOType" style="visibility: hidden">
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="inlineRadioOptions"
+            id="PORadio"
+            value="PO"
+            checked
+          />
+          <label class="form-check-label" for="inlineRadio1">PO</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="inlineRadioOptions"
+            id="RINRadio"
+            value="RIN"
+          />
+          <label class="form-check-label" for="inlineRadio2">RIN</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="inlineRadioOptions"
+            id="outgoingRadio"
+            value="Outgoing"
+          />
+          <label class="form-check-label" for="inlineRadio3"
+            >Direct Ship/FBA</label
+          >
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="inlineRadioOptions"
+            id="deleteRadio"
+            value="Delete"
+          />
+          <label class="form-check-label" for="inlineRadio4">Delete Data</label>
+        </div>
+      </div>
+
+      <div id="loader" style="visibility: hidden"></div>
+      <a id="txtHint"></a> <br />
+      <pre id="content"></pre>
+    </div>
+    <!--
             --------------------           body     --------------------------
           -->
-        </div>
-        <br /><br />
-      </div>
-    </div>
+
+    <br /><br />
+
     <br />
     <script
       async

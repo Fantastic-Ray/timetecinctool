@@ -1,53 +1,131 @@
 <!DOCTYPE html>
-<html ng-app='timetec' lang="en">
+<html ng-app="timetec" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://www.gstatic.com/firebasejs/3.6.3/firebase.js"></script>
+    <title>Timetec Login</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://www.atlasestateagents.co.uk/javascript/tether.min.js"></script>
+    <script src="scripts/login.js"></script>
 
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://www.gstatic.com/firebasejs/3.6.3/firebase.js"></script>
-  <title>Timetec Login</title>
-  <link href="css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="https://www.atlasestateagents.co.uk/javascript/tether.min.js"></script>
-  <script src="scripts/login.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
+    <script src="scripts/bootstrap.min.js"></script>
+  </head>
+  <style>
+    html,
+    body {
+      height: 100%;
+    }
+    body {
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-align: center;
+      align-items: center;
+      padding-top: 40px;
+      padding-bottom: 40px;
+      background-color: #f5f5f5;
+    }
+    .form-signin {
+      width: 100%;
+      max-width: 430px;
+      padding: 15px;
+      margin: auto;
+    }
+    .form-signin .form-control {
+      position: relative;
+      box-sizing: border-box;
+      height: auto;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .form-signin .form-control:focus {
+      z-index: 2;
+    }
+    .form-signin .checkbox {
+      font-weight: 400;
+    }
+    .form-signin input[type="email"] {
+      margin-bottom: -1px;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    .form-signin input[type="password"] {
+      margin-bottom: 10px;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+    .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-
-  <script src="scripts/bootstrap.min.js"></script>
-</head>
-
-<body>
-  <header>
-    <div style="text-align:center; margin-top:12%; margin-left: 12%; margin-right: 12%;">
-      <img src='image/logo.png' class='d-inline-block align-top' alt="Timetec Inc">
-
-      <h4>E-Commerce System</h4>
-    </div>
-
-    <div class="container">
-      <br>
-      <!--<form class="form-signin">
-          <label for="inputEmail">E-Mail:</label>
-          <input type="email" size="30" id="inputEmail" class="form-control" placeholder="E-Mail" required autofocus>
-          <br>
-          <label for="inputPassword">Password:</label>
-          <input type="password" size="30" id="inputPassword" class="form-control" placeholder="Password" required>
-        </form>-->
-      <br>
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+      }
+    }
+  </style>
+  <body class="text-center">
+    <form class="form-signin">
       <div style="text-align:center;">
-        <button id="loginBtn" onclick="authLogin()" class="btn btn-md btn-primary" type="submit" style="width:80%">Enter</button>
+        <img src="image/logo.png" alt="Timetec Inc" style="width:400px" />
+        <h4>E-Commerce System</h4>
       </div>
-
-    </div>
-    <br><br>
-
-    <br>
+      <input
+        type="email"
+        size="30"
+        id="inputEmail"
+        class="form-control"
+        placeholder="E-Mail"
+        required
+        autofocus
+      />
+      <input
+        type="password"
+        size="30"
+        id="inputPassword"
+        class="form-control"
+        placeholder="Password"
+        required
+      />
+      <p>Note: Use your timetecinc email <br />The password is Timetec1911</p>
+      <div class="checkbox mb-3">
+        <label>
+          <input type="checkbox" value="remember-me" /> Remember me
+        </label>
+      </div>
+      <div style="text-align:center;">
+        <button
+          id="loginBtn"
+          onclick="authLogin()"
+          class="btn btn-md btn-primary"
+          type="button"
+          style="width:100%"
+        >
+          Enter
+        </button>
+      </div>
+      <p class="mt-5 mb-3 text-muted">
+        &copy; 2017-2019 Timetec Inc Ruigang Gu
+      </p>
+    </form>
     <div id="logError"></div>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-</body>
-
+    <script
+      src="https://unpkg.com/react@16/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+  </body>
 </html>

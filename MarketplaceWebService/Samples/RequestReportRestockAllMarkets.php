@@ -22,6 +22,12 @@
 
 include_once ('.config.inc.php'); 
 
+$requestInfo = $_REQUEST["requestInfo"];
+
+$requestCountry = $requestInfo;
+
+$serviceUrl = "";
+
 /************************************************************************
 * Uncomment to configure the client instance. Configuration settings
 * are:
@@ -33,9 +39,16 @@ include_once ('.config.inc.php');
 // IMPORTANT: Uncomment the approiate line for the country you wish to
 // sell in:
 // United States:
-//$serviceUrl = "https://mws.amazonservices.com";
+if($requestCountry == "US" || $requestCountry == "CA" || $requestCountry == "MX"){
+    global $serviceUrl;
+   
+    $serviceUrl= "https://mws.amazonservices.com";
+}
 // United Kingdom
-//$serviceUrl = "https://mws.amazonservices.co.uk";
+if($requestCountry == "EU"){
+    global $serviceUrl;
+    $serviceUrl = "https://mws.amazonservices.co.uk";
+}
 // Germany
 //$serviceUrl = "https://mws.amazonservices.de";
 // France
@@ -43,13 +56,10 @@ include_once ('.config.inc.php');
 // Italy
 //$serviceUrl = "https://mws.amazonservices.it";
 // Japan
-//$serviceUrl = "https://mws.amazonservices.jp";
-// China
-//$serviceUrl = "https://mws.amazonservices.com.cn";
-// Canada
-$serviceUrl = "https://mws.amazonservices.ca";
-// India
-//$serviceUrl = "https://mws.amazonservices.in";
+if($requestCountry == "JP"){
+    global $serviceUrl;
+    $serviceUrl = "https://mws.amazonservices.jp";
+}
 
 $config = array (
   'ServiceURL' => $serviceUrl,
@@ -65,13 +75,29 @@ $config = array (
  * are defined in the .config.inc.php located in the same 
  * directory as this sample
  ***********************************************************************/
- $service = new MarketplaceWebService_Client(
-     AWS_ACCESS_KEY_ID, 
-     AWS_SECRET_ACCESS_KEY, 
-     $config,
-     APPLICATION_NAME,
-     APPLICATION_VERSION);
- 
+$service =new MarketplaceWebService_Client(
+    AWS_ACCESS_KEY_ID, 
+    AWS_SECRET_ACCESS_KEY, 
+    $config,
+    APPLICATION_NAME,
+    APPLICATION_VERSION);
+  
+if($requestCountry == "EU"){
+    $service = new MarketplaceWebService_Client(
+        AWS_ACCESS_KEY_ID_EU, 
+        AWS_SECRET_ACCESS_KEY_EU, 
+        $config,
+        APPLICATION_NAME,
+        APPLICATION_VERSION);
+ }
+ if($requestCountry == "JP"){
+    $service = new MarketplaceWebService_Client(
+        AWS_ACCESS_KEY_ID_JP, 
+        AWS_SECRET_ACCESS_KEY_JP, 
+        $config,
+        APPLICATION_NAME,
+        APPLICATION_VERSION);
+ }
 /************************************************************************
  * Uncomment to try out Mock Service that simulates MarketplaceWebService
  * responses without calling MarketplaceWebService service.
@@ -90,7 +116,19 @@ $config = array (
  ***********************************************************************/
 // Constructing the MarketplaceId array which will be passed in as the the MarketplaceIdList 
 // parameter to the RequestReportRequest object.
-$marketplaceIdArray = array("Id" => array('A2EUQ1WTGCTBG2'));
+$marketplaceIdArray = array("Id" => array('ATVPDKIKX0DER'));
+if($requestCountry == "CA"){
+    $marketplaceIdArray = array("Id" => array('A2EUQ1WTGCTBG2'));
+}
+if($requestCountry == "MX"){
+    $marketplaceIdArray = array("Id" => array('A1AM78C64UM0Y8'));
+}
+if($requestCountry == "EU"){
+    $marketplaceIdArray = array("Id" => array('A1F83G8C2ARO7P'));
+}
+if($requestCountry == "JP"){
+    $marketplaceIdArray = array("Id" => array('A1VC38T7YXB528'));
+}
 
  // @TODO: set request. Action can be passed as MarketplaceWebService_Model_ReportRequest
  // object or array of parameters
@@ -108,13 +146,25 @@ $marketplaceIdArray = array("Id" => array('A2EUQ1WTGCTBG2'));
    $request = new MarketplaceWebService_Model_RequestReportRequest();
    $request->setMarketplaceIdList($GLOBALS['marketplaceIdArray']);
    $request->setMerchant(MERCHANT_ID);
-   $request->setReportType('_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA_');
-  // $request->setMWSAuthToken('<MWS Auth Token>'); // Optional
 
-  // Using ReportOptions
-  // $request->setReportOptions('ShowSalesChannel=true');
-   $RequestRID = '';
+    if($requestCountry == "MX"){
+        $request->setMerchant(MERCHANTMX_ID);
+        $request->setMWSAuthToken('amzn.mws.7cb3ae52-b407-31a3-4499-482ff57d7ad8');
+    }
+    if($requestCountry == "EU"){
+        $request->setMerchant(MERCHANTEU_ID);
+    }
+    if($requestCountry == "JP"){
+        $request->setMerchant(MERCHANTJP_ID);
+    }
+   $request->setReportType('_GET_RESTOCK_INVENTORY_RECOMMENDATIONS_REPORT_');
 
+   // $request->setMWSAuthToken('<MWS Auth Token>'); // Optional
+
+   // Using ReportOptions
+   // $request->setReportOptions('ShowSalesChannel=true');
+  
+   
   invokeRequestReport($service, $request);
   function invokeRequestReport(MarketplaceWebService_Interface $service, $request) 
   {

@@ -121,6 +121,8 @@ $config = array (
   */
   function invokeGetReportList(MarketplaceWebService_Interface $service, $request,$requestID) 
   {
+    $nowTime = new DateTime('NOW');
+    $diff = date_sub($nowTime,new DateInterval('P0Y0DT0H30M'));
       try {
               $response = $service->getReportList($request);
               
@@ -153,13 +155,17 @@ $config = array (
                         if ($reportInfo->isSetReportRequestId()) 
                         {
                             
-                            $reportInfo->getReportRequestId();
-                            //echo nl2br($reportInfo->getReportRequestId(). "\n");
-                            if($reportInfo->getReportRequestId() == $requestID){
-                                echo nl2br("found getReportId");
-                                echo($reportInfo->getReportId());
-                                return;
-                              }
+                            if($reportRequestInfo->getReportRequestId() == $requestID){
+                                echo nl2br("ReportRequestId Found" . $requestID . "\n" );
+                                if($reportRequestInfo->isSetReportProcessingStatus()){
+                                    $reportRequestInfo->getReportProcessingStatus();
+                                     echo nl2br("ReportProcessingStatus" . $reportRequestInfo->getReportProcessingStatus() . "\n" );
+                                }
+                                if($reportRequestInfo->isSetGeneratedReportId()){
+                                  echo nl2br("getGeneratedReportID Found!\n");
+                                  echo nl2br($reportRequestInfo->getGeneratedReportId());
+                                  return;
+                                }
                         }
                         if ($reportInfo->isSetAvailableDate()) 
                         {

@@ -551,19 +551,34 @@ function getSingleCountryInventory(result) {
   let singleUnsellable = 0;
   let singleTotal = 0;
   let lines = result.split("\n");
+  let firstLine = lines[0].split("\t");
   let sku;
   let line;
   let singleCountryTable = [];
+  console.log("lines[0].split()", lines[0].split("\t"));
+  console.log("lines[0].split() length", lines[0].split("\t").length);
+  let skuIndex = firstLine.indexOf("sku");
+  console.log("skuIndex", skuIndex);
+  let ffableIndex = firstLine.indexOf("afn-fulfillable-quantity");
+  console.log("afn-fulfillable-quantity", ffableIndex);
+
+  let reservedIndex = firstLine.indexOf("afn-reserved-quantity");
+  let unsellIndex = firstLine.indexOf("afn-unsellable-quantity");
+  let receivingIndex = firstLine.indexOf("afn-inbound-receiving-quantity");
+  console.log("receivingIndex", receivingIndex);
+  let inboundIndex = firstLine.indexOf("afn-inbound-shipped-quantity");
+  let workingIndex = firstLine.indexOf("afn-inbound-working-quantity");
+  let totalIndex = firstLine.indexOf("afn-total-quantity");
   for (let i = 1; i < lines.length; i++) {
     line = lines[i].split("\t");
-    sku = line[0].split(".")[0];
+    sku = line[skuIndex].split(".")[0].toUpperCase();
 
-    sinlgeFulfillable = parseInt(line[10]);
-    singleUnsellable = parseInt(line[11]);
-    singleReserved = parseInt(line[12]);
-    singleInbound = parseInt(line[16]);
+    sinlgeFulfillable = parseInt(line[ffableIndex]);
+    singleUnsellable = parseInt(line[unsellIndex]);
+    singleReserved = parseInt(line[reservedIndex]);
+    singleInbound = parseInt(line[inboundIndex]);
     singleReceiving = parseInt(line[17]);
-    singleTotal = parseInt(line[13]) - parseInt(line[15]);
+    singleTotal = parseInt(line[totalIndex]) - parseInt(line[workingIndex]);
 
     if (singleCountryTable[sku]) {
       singleCountryTable[sku] = {
@@ -598,20 +613,29 @@ function getAllCountriesInventory(result) {
   let total = 0;
 
   var lines = result.split("\n");
+  let firstLine = lines[0].split("\t");
   var sku;
   var line;
-
+  let skuIndex = firstLine.indexOf("sku");
+  let asinIndex = firstLine.indexOf("asin");
+  let ffableIndex = firstLine.indexOf("afn-fulfillable-quantity");
+  let reservedIndex = firstLine.indexOf("afn-reserved-quantity");
+  let unsellIndex = firstLine.indexOf("afn-unsellable-quantity");
+  let receivingIndex = firstLine.indexOf("afn-inbound-receiving-quantity");
+  let inboundIndex = firstLine.indexOf("afn-inbound-shipped-quantity");
+  let workingIndex = firstLine.indexOf("afn-inbound-working-quantity");
+  let totalIndex = firstLine.indexOf("afn-total-quantity");
   for (var i = 1; i < lines.length; i++) {
     line = lines[i].split("\t");
-    sku = line[0].split(".")[0];
-    ASIN = line[2];
-    fulfillable = parseInt(line[10]);
+    sku = line[skuIndex].split(".")[0].toUpperCase();
+    ASIN = line[asinIndex];
+    fulfillable = parseInt(line[ffableIndex]);
     //console.log("fullfillable ", fulfillable);
-    unsellable = parseInt(line[11]);
-    reserved = parseInt(line[12]);
-    inbound = parseInt(line[16]);
+    unsellable = parseInt(line[unsellIndex]);
+    reserved = parseInt(line[reservedIndex]);
+    inbound = parseInt(line[inboundIndex]);
     receiving = parseInt(line[17]);
-    total = parseInt(line[13]) - parseInt(line[15]);
+    total = parseInt(line[totalIndex]) - parseInt(line[workingIndex]);
 
     if (totalInv[sku]) {
       totalInv[sku] = {
@@ -652,11 +676,32 @@ function getFinalResult() {
           for (i = 0; i < range.values.length; i++) {
             var row = range.values[i];
             // Print columns A and E, which correspond to indices 0 and 4.
-            localInvTable[row[3]] = {
-              LocalInv: row[4],
-              PartNumber: row[2],
-              ID: row[0]
-            };
+            if (row[3] == undefined) {
+              localInvTable["blank" + i] = {
+                LocalInv: "",
+                PartNumber: "",
+                ID: ""
+              };
+            } else {
+              var tempSKU = row[3].split("_")[0];
+              if (localInvTable[tempSKU]) {
+                localInvTable[tempSKU] = {
+                  LocalInv:
+                    parseInt(localInvTable[tempSKU].LocalInv) +
+                    parseInt(row[4]),
+                  PartNumber: row[2],
+                  ID: localInvTable[tempSKU].ID
+                };
+              } else {
+                localInvTable[tempSKU] = {
+                  LocalInv: row[4],
+                  PartNumber: row[2],
+                  ID: row[0]
+                };
+              }
+            }
+
+            console.log("local PC table " + row[3]);
           }
           gapi.client.sheets.spreadsheets.values
             .get({
@@ -675,6 +720,7 @@ function getFinalResult() {
                       PartNumber: row[2],
                       ID: row[0]
                     };
+                    console.log("row 3", row[3]);
                   }
                   for (var sku in singleSKUTotalTable) {
                     let totalUSFBA = 0;
@@ -737,6 +783,7 @@ function convertSinlgeSKU(table) {
   let kit = 1;
   let singleSKUTable = [];
   for (var sku in table) {
+    sku = sku.split("_")[0];
     if (sku.includes("-")) {
       let temp = sku.split("-")[1];
       if (temp.includes("K")) {
@@ -866,7 +913,6 @@ function buildFinalTable(localInvTable, data) {
   sheetTable.push([
     "No.",
     "Timetec Part",
-    "TG P/N",
     "Local",
     "FBA Total",
     "Total",
@@ -876,37 +922,56 @@ function buildFinalTable(localInvTable, data) {
     "FBA EU",
     "FBA JP"
   ]);
-  for (var sku in data) {
+  for (var sku in localInvTable) {
     let sheetline = [];
-    if (localInvTable[sku]) {
-      sheetline.push(localInvTable[sku].ID);
-    } else {
-      sheetline.push("");
-    }
-    sheetline.push(sku);
-    if (localInvTable[sku]) {
-      sheetline.push(localInvTable[sku].PartNumber);
-      sheetline.push(localInvTable[sku].LocalInv);
-    } else {
-      sheetline.push("");
-      sheetline.push("");
-    }
+    if (data[sku]) {
+      if (localInvTable[sku]) {
+        sheetline.push(localInvTable[sku].ID);
+      } else {
+        sheetline.push("");
+      }
+      sheetline.push(sku);
+      if (localInvTable[sku]) {
+        //sheetline.push(localInvTable[sku].PartNumber);
+        sheetline.push(localInvTable[sku].LocalInv);
+      } else {
+        sheetline.push("");
+        sheetline.push("");
+      }
+      if (data[sku]) {
+        sheetline.push(data[sku].TotalFBA);
+      } else {
+        sheetline.push("");
+      }
 
-    sheetline.push(data[sku].TotalFBA);
-    if (localInvTable[sku]) {
-      sheetline.push(
-        parseInt(data[sku].TotalFBA) + parseInt(localInvTable[sku].LocalInv)
-      );
-    } else {
-      sheetline.push(data[sku].TotalFBA);
-    }
+      if (localInvTable[sku]) {
+        sheetline.push(
+          parseInt(data[sku].TotalFBA) + parseInt(localInvTable[sku].LocalInv)
+        );
+      } else {
+        sheetline.push(data[sku].TotalFBA);
+      }
 
-    sheetline.push(data[sku].USTotal);
-    sheetline.push(data[sku].CATotal);
-    sheetline.push(data[sku].MXTotal);
-    sheetline.push(data[sku].EUTotal);
-    sheetline.push(data[sku].JPTotal);
-    sheetTable.push(sheetline);
+      sheetline.push(data[sku].USTotal);
+      sheetline.push(data[sku].CATotal);
+      sheetline.push(data[sku].MXTotal);
+      sheetline.push(data[sku].EUTotal);
+      sheetline.push(data[sku].JPTotal);
+
+      sheetTable.push(sheetline);
+    } else if (sku.includes("blank")) {
+      sheetline.push("");
+      sheetline.push("");
+      sheetline.push("");
+      sheetline.push("");
+      sheetline.push("");
+      sheetline.push("");
+      sheetline.push("");
+      sheetline.push("");
+      sheetline.push("");
+      sheetline.push("");
+      sheetTable.push(sheetline);
+    }
   }
   finalTotalSpreadsheetTable = sheetTable;
   $("#sendButton").html(
@@ -1210,7 +1275,7 @@ function getLocalInv() {
             };
           }
         } else {
-          console.log("no data from PC 2018");
+          console.log("no data from PC 2019");
         }
       },
       function(response) {
